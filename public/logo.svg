@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" fill="none">
+  <!-- LT Monogram -->
+  <!-- L: vertical bar (left, full height) -->
+  <rect x="18" y="18" width="34" height="148" fill="#16603D"/>
+  <!-- L: horizontal bar (bottom) -->
+  <rect x="18" y="132" width="90" height="34" fill="#16603D"/>
+  <!-- T: horizontal bar (top) -->
+  <rect x="52" y="18" width="130" height="34" fill="#16603D"/>
+  <!-- T: vertical bar -->
+  <rect x="112" y="18" width="34" height="148" fill="#16603D"/>
+
+  <!-- LETO wordmark -->
+  <text
+    x="100"
+    y="215"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="26"
+    font-weight="700"
+    letter-spacing="14"
+    fill="#16603D"
+  >LETO</text>
+</svg>
