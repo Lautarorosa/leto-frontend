@@ -1,4 +1,4 @@
-﻿// Server component — force-dynamic so useSearchParams() works without Suspense
+// Server component — force-dynamic so useSearchParams() works without Suspense
 export const dynamic = 'force-dynamic';
 
 import { Suspense } from 'react';
