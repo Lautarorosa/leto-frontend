@@ -19,13 +19,13 @@ export function useApi() {
   const router = useRouter();
 
   const call = useCallback(
-    async (endpoint: string, options: RequestInit = {}) => {
+    async function callApi<T = unknown>(endpoint: string, options: RequestInit = {}): Promise<T | null> {
       setLoading(true);
       setError(null);
       try {
         const res = await fetch(`${API_BASE}${endpoint}`, {
           ...options,
-          credentials: "include",   // A04: send HttpOnly cookie automatically
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
             ...options.headers,
@@ -38,16 +38,21 @@ export function useApi() {
           return null;
         }
 
-        return res;
-      } catch (err: any) {
-        setError(err.message || "Error de red");
+        if (!res.ok) {
+          setError(`Error ${res.status}`);
+          return null;
+        }
+
+        return await res.json() as T;
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Error de red");
         return null;
       } finally {
         setLoading(false);
       }
     },
     [router]
-  );
+  ) as <T = unknown>(endpoint: string, options?: RequestInit) => Promise<T | null>;
 
   return { call, loading, error };
 }
