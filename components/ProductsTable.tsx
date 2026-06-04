@@ -308,4 +308,28 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
               <button
                 onClick={() => handlePage(page - 1)}
                 disabled={page === 0}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 tex
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#16603D]/50 hover:text-[#16603D] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                ← Anterior
+              </button>
+              <span className="px-3 py-1.5 text-xs text-slate-400">
+                {page + 1} / {totalPages}
+              </span>
+              <button
+                onClick={() => handlePage(page + 1)}
+                disabled={page >= totalPages - 1}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#16603D]/50 hover:text-[#16603D] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Siguiente →
+              </button>
+            </div>
+          </div>
+        )}
+      ) : (
+        <div className="py-20 text-center">
+          <p className="text-slate-400 text-sm">No se encontraron productos.</p>
+        </div>
+      )}
+    </div>
+  );
+}
