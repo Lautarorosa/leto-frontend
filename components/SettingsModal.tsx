@@ -74,8 +74,8 @@ export function SettingsModal({
     if (!isOpen) return;
     setLoading(true);
     Promise.all([
-      call<Settings>('/api/v1/settings/', { method: 'GET' }),
-      call<AutopilotSettings>('/api/v1/autopilot/', { method: 'GET' }),
+      call('/api/v1/settings/', { method: 'GET' }),
+      call('/api/v1/autopilot/', { method: 'GET' }),
     ]).then(([s, a]) => {
       if (s) {
         setSettings(s);
@@ -89,7 +89,7 @@ export function SettingsModal({
 
   const handleSave = async () => {
     setSaving(true);
-    const res = await call<Settings>('/api/v1/settings/', {
+    const res = await call('/api/v1/settings/', {
       method: 'PUT',
       body: JSON.stringify(settings),
     });
@@ -104,7 +104,7 @@ export function SettingsModal({
 
   const handleSaveAutopilot = async () => {
     setSavingAutopilot(true);
-    const res = await call<AutopilotSettings>('/api/v1/autopilot/', {
+    const res = await call('/api/v1/autopilot/', {
       method: 'PUT',
       body: JSON.stringify({
         enabled: autopilot.enabled,
@@ -120,7 +120,7 @@ export function SettingsModal({
   const handleRunAutopilot = async () => {
     setRunningAutopilot(true);
     setAutopilotResult(null);
-    const res = await call<{ applied: number; skipped_guardrail: number }>('/api/v1/autopilot/run', { method: 'POST' });
+    const res = await call('/api/v1/autopilot/run', { method: 'POST' });
     setRunningAutopilot(false);
     if (res) setAutopilotResult(res);
   };

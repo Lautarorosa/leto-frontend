@@ -353,7 +353,7 @@ export default function Dashboard() {
 
   const loadMetrics = useCallback(async () => {
     setMetricsLoading(true);
-    const d = await call<DashboardMetrics>('/api/v1/dashboard/metrics', { method: 'GET' });
+    const d = await call('/api/v1/dashboard/metrics', { method: 'GET' });
     if (d) setMetrics(d);
     setMetricsLoading(false);
   }, [call]);
@@ -361,7 +361,7 @@ export default function Dashboard() {
   // Products are fetched by ProductsTable internally — no need to fetch here too.
   // We keep a separate fetch only for the charts (WorstChart, CategoryBars, PriorityList).
   const loadProducts = useCallback(async () => {
-    const d = await call<{ products: Product[]; total: number }>('/api/v1/products/?limit=200', { method: 'GET' });
+    const d = await call('/api/v1/products/?limit=200', { method: 'GET' });
     if (d) setProducts(d.products);
   }, [call]);
 
@@ -379,7 +379,7 @@ export default function Dashboard() {
     setNoCostToast(null);
     setSelected(p);
     setLoadingRec(true);
-    const r = await call<Recommendation>(`/api/v1/recommendations/${p.id}`, { method: 'GET' });
+    const r = await call(`/api/v1/recommendations/${p.id}`, { method: 'GET' });
     setLoadingRec(false);
     if (r && Array.isArray(r.options) && r.options.length > 0) {
       setRec(r);
@@ -400,7 +400,7 @@ export default function Dashboard() {
     try {
       const { generatePDFReport } = await import('@/utils/pdfReport');
       // Fetch recommendation history for page 4
-      const histData = await call<{ items: import('@/utils/pdfReport').RecommendationHistoryItem[]; total: number }>(
+      const histData = await call(
         '/api/v1/recommendations/history/all',
         { method: 'GET' }
       );
