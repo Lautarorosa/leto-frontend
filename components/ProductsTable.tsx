@@ -196,6 +196,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
 
       {/* Table */}
       {visible.length > 0 ? (
+        <>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -325,6 +326,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
             </div>
           </div>
         )}
+        </>
       ) : (
         <div className="py-20 text-center">
           <p className="text-slate-400 text-sm">No se encontraron productos.</p>
