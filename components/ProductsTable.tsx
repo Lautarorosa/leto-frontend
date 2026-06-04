@@ -93,7 +93,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
     } else {
       endpoint = `/api/v1/products/?margin_level=${activeFilter}&limit=${PAGE_SIZE}&skip=${skip}`;
     }
-    const data = await call<ProductsResponse>(endpoint, { method: 'GET' });
+    const data = await call(endpoint, { method: "GET" }) as ProductsResponse | null;
     if (data) {
       setProducts(data.products);
       setStats(data.margin_stats);
