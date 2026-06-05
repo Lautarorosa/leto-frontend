@@ -888,4 +888,21 @@ export default function Dashboard() {
           currentMargin={rec.current_margin}
           options={rec.options ?? []}
           recommendedOption={rec.recommended_option}
-          costBreakdown={rec.cost_breakdown}
+          costBreakdown={rec.cost_breakdown}          isOpen={!!selected}
+          onClose={handleClose}
+          onApply={() => { handleClose(); invalidateAll(); }}
+        />
+      )}
+
+      {selected && loadingRec && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#111] rounded-xl border border-slate-200 dark:border-white/10 p-8 text-center max-w-xs w-full">
+            <div className="spinner h-8 w-8 mx-auto mb-3" style={{ borderColor: GREEN }} />
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Analizando producto…</p>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
