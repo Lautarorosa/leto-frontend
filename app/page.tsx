@@ -8,10 +8,77 @@ import LetoLogo from '@/components/LetoLogo';
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const IS_DEV   = process.env.NODE_ENV === 'development';
 
+const TEXTS = {
+  es: {
+    badge: 'Analisis de margenes para TiendaNube',
+    h1a: 'Cuanto estas', h1b: 'perdiendo', h1c: 'sin saberlo?',
+    sub: 'Tus margenes reales son', subBold: '5-8% mas bajos', subEnd: 'de lo que crees. Las comisiones de TiendaNube y la pasarela se comen tu ganancia.',
+    cta: 'Conectar mi tienda gratis', demo: 'Ver demo', navCta: 'Conectar tienda',
+    s1l: 'Comision minima real', s2l: 'Productos en riesgo', s3l: 'Para ver tus numeros',
+    s1s: 'TN 2% + pasarela 3.49%', s2s: 'Promedio tiendas LATAM', s3s: 'Sin setup complejo',
+    simTitle: 'Calcula tu perdida ahora', simSub: 'Sin registrarte. Solo dos numeros.',
+    prod: 'PRODUCTOS', ticket: 'TICKET PROMEDIO',
+    calcBtn: 'Calcular mi perdida mensual', riskLabel: 'productos con margen negativo real',
+    riskSub: 'despues de comisiones TN + pasarela', lossLabel: 'Perdida mensual estimada',
+    simCta: 'Ver el numero exacto de mi tienda', simDisc: 'Estimacion basada en promedios de tiendas LATAM',
+    howTitle: 'Como funciona', howSub: 'De cero a decisiones de precio en 4 pasos.',
+    steps: [
+      { n: '01', title: 'Conectas tu TiendaNube',     body: 'OAuth seguro. LETO lee tu catalogo y precios, nunca modifica nada sin tu aprobacion.' },
+      { n: '02', title: 'Cargas tus costos reales',   body: 'Subis un Excel con el costo de cada producto, o los cargas uno por uno.' },
+      { n: '03', title: 'LETO calcula el margen real', body: 'Suma comisiones TN + pasarela + envio. Te dice exactamente que productos te hacen perder dinero.' },
+      { n: '04', title: 'Tomas accion con 1 click',   body: 'Para cada problema, LETO te da 3 opciones claras. Vos eleges y confirmas, LETO ejecuta.' },
+    ],
+    featTitle: 'Todo lo que necesitas',
+    feats: [
+      { title: 'Margenes reales en tiempo real', body: 'Ve exactamente cuanto ganas en cada producto despues de todas las comisiones.' },
+      { title: 'Recomendaciones concretas',      body: '3 opciones por producto problematico: subir precio, liquidar, o pausar.' },
+      { title: 'Autopilot con guardrails',       body: 'Ajustes automaticos dentro de los limites que vos configuras.' },
+    ],
+    trust: ['Solo lectura al catalogo', 'Cambios solo con tu aprobacion', 'Sin tarjeta de credito', 'Datos encriptados'],
+    ctaTitle: 'Empieza a ver tus numeros reales', ctaSub: 'Conecta tu tienda en 3 minutos. Sin setup. Sin tarjeta.',
+    ctaBtn: 'Conectar con TiendaNube', connecting: 'Conectando...',
+    terms: 'Terminos', privacy: 'Privacidad',
+    errBackend: 'No se puede conectar al backend.',
+  },
+  en: {
+    badge: 'Margin analysis for TiendaNube stores',
+    h1a: 'How much are you', h1b: 'losing', h1c: 'without knowing it?',
+    sub: 'Your real margins are', subBold: '5-8% lower', subEnd: 'than you think. TiendaNube and gateway fees eat your profit product by product.',
+    cta: 'Connect my store for free', demo: 'See demo', navCta: 'Connect store',
+    s1l: 'Minimum real commission', s2l: 'Products at risk', s3l: 'To see your numbers',
+    s1s: 'TN 2% + gateway 3.49%', s2s: 'Average LATAM stores', s3s: 'No complex setup',
+    simTitle: 'Calculate your loss now', simSub: 'No sign-up. Just two numbers.',
+    prod: 'PRODUCTS', ticket: 'AVG TICKET',
+    calcBtn: 'Calculate my monthly loss', riskLabel: 'products with real negative margin',
+    riskSub: 'after TN + gateway fees', lossLabel: 'Estimated monthly loss',
+    simCta: 'See exact numbers for my store', simDisc: 'Estimate based on LATAM store averages',
+    howTitle: 'How it works', howSub: 'From zero to pricing decisions in 4 steps.',
+    steps: [
+      { n: '01', title: 'Connect your TiendaNube',    body: 'Secure OAuth. LETO reads your catalog and prices, never modifies anything without your approval.' },
+      { n: '02', title: 'Load your real costs',        body: 'Upload an Excel with the cost of each product, or enter them one by one.' },
+      { n: '03', title: 'LETO calculates real margin', body: 'Adds TN + gateway + shipping. Tells you exactly which products are losing you money.' },
+      { n: '04', title: 'Take action with 1 click',   body: 'For each issue, LETO gives you 3 clear options. You choose and confirm — LETO executes.' },
+    ],
+    featTitle: 'Everything you need',
+    feats: [
+      { title: 'Real-time real margins',    body: 'See exactly how much you earn on each product after all fees.' },
+      { title: 'Concrete recommendations', body: '3 options per problematic product: raise price, liquidate, or pause.' },
+      { title: 'Autopilot with guardrails', body: 'Automatic adjustments within the limits you configure.' },
+    ],
+    trust: ['Read-only catalog access', 'Changes only with your approval', 'No credit card required', 'Encrypted data'],
+    ctaTitle: 'Start seeing your real numbers', ctaSub: 'Connect your store in 3 minutes. No setup. No credit card.',
+    ctaBtn: 'Connect with TiendaNube', connecting: 'Connecting...',
+    terms: 'Terms', privacy: 'Privacy',
+    errBackend: 'Cannot connect to backend.',
+  },
+} as const;
+
+type Lang = keyof typeof TEXTS;
+
 function fmtMoney(n: number) {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `$${Math.round(n / 1_000)}K`;
-  return `$${Math.round(n).toLocaleString('es-AR')}`;
+  if (n >= 1_000_000) return '$' + (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000)     return '$' + Math.round(n / 1_000) + 'K';
+  return '$' + Math.round(n).toLocaleString('es-AR');
 }
 
 function calcSim(products: number, avgTicket: number) {
@@ -61,15 +128,21 @@ const IconSun = () => (
   </svg>
 );
 
-function Simulator({ onConnect, dark, lang }: { onConnect: () => void; dark: boolean; lang: 'es'|'en' }) {
+interface SimProps { onConnect: () => void; dark: boolean; tx: typeof TEXTS['es']; }
+
+function Simulator({ onConnect, dark, tx }: SimProps) {
   const [products,  setProducts]  = useState(80);
   const [avgTicket, setAvgTicket] = useState(4500);
   const [revealed,  setRevealed]  = useState(false);
   const sim = calcSim(products, avgTicket);
 
   const inputCls = dark
-    ? 'w-full px-4 py-3 rounded-xl border border-white/15 text-white text-lg font-bold focus:outline-none focus:border-emerald-500/60 transition-all [background:rgba(255,255,255,0.08)]'
-    : 'w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-lg font-bold focus:outline-none focus:border-emerald-500 transition-all [background:#f1f5f9]';
+    ? 'w-full px-4 py-3 rounded-xl border border-white/15 text-white text-lg font-bold focus:outline-none focus:border-emerald-500/60 transition-all'
+    : 'w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-lg font-bold focus:outline-none focus:border-emerald-500 transition-all';
+
+  const inputStyle = dark
+    ? { background: 'rgba(255,255,255,0.08)' }
+    : { background: '#f1f5f9' };
 
   const cardCls = dark
     ? 'bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 space-y-5'
@@ -80,61 +153,57 @@ function Simulator({ onConnect, dark, lang }: { onConnect: () => void; dark: boo
       <div className={cardCls}>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className={`block text-xs font-semibold mb-2 uppercase tracking-wider ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Productos
+            <label className={'block text-xs font-semibold mb-2 uppercase tracking-wider ' + (dark ? 'text-slate-400' : 'text-slate-500')}>
+              {tx.prod}
             </label>
             <input
               type="number" min={1} value={products}
               onChange={e => { setProducts(Math.max(1, parseInt(e.target.value) || 1)); setRevealed(false); }}
-              className={inputCls}
+              className={inputCls} style={inputStyle}
             />
           </div>
           <div>
-            <label className={`block text-xs font-semibold mb-2 uppercase tracking-wider ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Ticket promedio
+            <label className={'block text-xs font-semibold mb-2 uppercase tracking-wider ' + (dark ? 'text-slate-400' : 'text-slate-500')}>
+              {tx.ticket}
             </label>
             <div className="relative">
-              <span className={`absolute left-4 top-1/2 -translate-y-1/2 font-bold text-sm ${dark ? 'text-slate-400' : 'text-slate-500'}`}>$</span>
+              <span className={'absolute left-4 top-1/2 -translate-y-1/2 font-bold text-sm ' + (dark ? 'text-slate-400' : 'text-slate-500')}>$</span>
               <input
                 type="number" min={1} value={avgTicket}
                 onChange={e => { setAvgTicket(Math.max(1, parseInt(e.target.value) || 1)); setRevealed(false); }}
-                className={inputCls.replace('px-4', 'pl-8 pr-4')}
+                className={inputCls.replace('px-4', 'pl-8 pr-4')} style={inputStyle}
               />
             </div>
           </div>
         </div>
 
         {!revealed ? (
-          <button
-            onClick={() => setRevealed(true)}
-            className="w-full py-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm font-bold hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-all"
-          >
-            Calcular mi pérdida mensual →
+          <button onClick={() => setRevealed(true)}
+            className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/20">
+            {tx.calcBtn} →
           </button>
         ) : (
           <div className="space-y-4">
-            <div className={`rounded-xl p-4 ${dark ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-200'}`}>
+            <div className={'rounded-xl p-4 ' + (dark ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-200')}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="text-red-500 flex-shrink-0"><IconWarning /></div>
                 <div>
-                  <p className={`text-sm font-bold ${dark ? 'text-white' : 'text-slate-900'}`}>
-                    ~{sim.productsAtRisk} {lang === 'es' ? 'productos con margen negativo real' : 'products with real negative margin'}
+                  <p className={'text-sm font-bold ' + (dark ? 'text-white' : 'text-slate-900')}>
+                    ~{sim.productsAtRisk} {tx.riskLabel}
                   </p>
-                  <p className={`text-xs mt-0.5 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{lang === 'es' ? 'despues de comisiones TN + pasarela' : 'after TN + gateway fees'}</p>
+                  <p className={'text-xs mt-0.5 ' + (dark ? 'text-slate-400' : 'text-slate-500')}>{tx.riskSub}</p>
                 </div>
               </div>
-              <div className={`flex items-center justify-between pt-3 border-t ${dark ? 'border-red-500/15' : 'border-red-200'}`}>
-                <span className={`text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{lang === 'es' ? 'Perdida mensual estimada' : 'Estimated monthly loss'}</span>
+              <div className={'flex items-center justify-between pt-3 border-t ' + (dark ? 'border-red-500/15' : 'border-red-200')}>
+                <span className={'text-xs ' + (dark ? 'text-slate-400' : 'text-slate-500')}>{tx.lossLabel}</span>
                 <span className="text-2xl font-black text-red-500">{fmtMoney(sim.estimatedLoss)}</span>
               </div>
             </div>
-            <button
-              onClick={onConnect}
-              className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
-            >
-              Ver el número exacto de mi tienda <IconArrow />
+            <button onClick={onConnect}
+              className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+              {tx.simCta} <IconArrow />
             </button>
-            <p className={`text-center text-[11px] ${dark ? 'text-slate-500' : 'text-slate-400'}`}>{lang === 'es' ? 'Estimacion basada en promedios de tiendas LATAM' : 'Estimate based on LATAM store averages'}</p>
+            <p className={'text-center text-[11px] ' + (dark ? 'text-slate-500' : 'text-slate-400')}>{tx.simDisc}</p>
           </div>
         )}
       </div>
@@ -148,7 +217,8 @@ export default function Home() {
   const [connecting,   setConnecting]   = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
   const [dark, setDark] = useState(true);
-  const [lang, setLang] = useState<'es'|'en'>('es');
+  const [lang, setLang] = useState<Lang>('es');
+  const tx = TEXTS[lang];
 
   useEffect(() => {
     if (!isLoading && user) router.replace('/dashboard');
@@ -158,8 +228,8 @@ export default function Home() {
     setConnecting(true);
     setConnectError(null);
     try {
-      const result = await fetch(`${API_BASE}/api/v1/auth/login`).then(r => {
-        if (!r.ok) throw new Error(`Backend respondio ${r.status}`);
+      const result = await fetch(API_BASE + '/api/v1/auth/login').then(r => {
+        if (!r.ok) throw new Error('Backend respondio ' + r.status);
         return r.json();
       });
       if (result?.authorization_url) {
@@ -169,7 +239,7 @@ export default function Home() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error desconocido';
-      setConnectError(msg.includes('fetch') ? 'No se puede conectar al backend.' : msg);
+      setConnectError(msg.includes('fetch') ? tx.errBackend : msg);
     } finally {
       setConnecting(false);
     }
@@ -183,24 +253,28 @@ export default function Home() {
     );
   }
 
-  const bg    = dark ? 'bg-[#060a06] text-white'           : 'bg-slate-50 text-slate-900';
-  const nav   = dark ? 'border-white/6'                    : 'border-slate-200 bg-white/80 backdrop-blur-md';
-  const pill  = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700';
-  const muted = dark ? 'text-slate-400'                    : 'text-slate-500';
-  const sec   = dark ? 'border-white/6'                    : 'border-slate-200';
-  const card  = dark ? 'bg-white/3 border-white/8 hover:bg-white/5 hover:border-white/15' : 'bg-white border-slate-200 hover:border-emerald-200 hover:shadow-sm';
-  const statVal = dark ? 'text-emerald-400'                : 'text-emerald-600';
-  const statSub = dark ? 'text-slate-500'                  : 'text-slate-400';
-  const trustItem = dark ? 'text-slate-400'                : 'text-slate-500';
-  const iconBg = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500/20' : 'bg-emerald-50 border-emerald-200 text-emerald-600 group-hover:bg-emerald-100';
-  const featIconBg = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-600';
-  const heading = dark ? 'text-white'                      : 'text-slate-900';
-  const body    = dark ? 'text-slate-400'                  : 'text-slate-600';
+  const bg       = dark ? 'bg-[#060a06] text-white'  : 'bg-slate-50 text-slate-900';
+  const navCls   = dark ? 'border-white/6 bg-[#060a06]/90 backdrop-blur-md' : 'border-slate-200 bg-white/90 backdrop-blur-md';
+  const pill     = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700';
+  const sec      = dark ? 'border-white/6'            : 'border-slate-200';
+  const card     = dark ? 'bg-white/3 border-white/8 hover:bg-white/5 hover:border-white/15' : 'bg-white border-slate-200 hover:border-emerald-200 hover:shadow-sm';
+  const statVal  = dark ? 'text-emerald-400'          : 'text-emerald-600';
+  const statSub  = dark ? 'text-slate-500'            : 'text-slate-400';
+  const iconBg   = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500/20' : 'bg-emerald-50 border-emerald-200 text-emerald-600 group-hover:bg-emerald-100';
+  const featIcon = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-600';
+  const heading  = dark ? 'text-white'                : 'text-slate-900';
+  const body     = dark ? 'text-slate-400'            : 'text-slate-600';
+  const muted    = dark ? 'text-slate-400'            : 'text-slate-500';
+  const toggleCls = dark
+    ? 'border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+    : 'border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300';
+  const demoBtnCls = dark
+    ? 'border-white/15 text-slate-200 hover:border-white/30 hover:bg-white/5'
+    : 'border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-100';
 
   return (
-    <div className={`min-h-screen overflow-x-hidden transition-colors duration-300 ${bg}`}>
+    <div className={'min-h-screen overflow-x-hidden transition-colors duration-300 ' + bg}>
 
-      {/* Ambient glow — dark only */}
       {dark && (
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[120px]"
@@ -208,98 +282,59 @@ export default function Home() {
         </div>
       )}
 
-      {/* Navbar */}
-      <nav className={`relative z-10 border-b sticky top-0 ${nav}`}>
+      <nav className={'relative z-10 border-b sticky top-0 ' + navCls}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <LetoLogo size={30} />
-            <span className={`text-[10px] font-semibold tracking-widest uppercase ml-1 ${dark ? 'text-slate-600' : 'text-slate-400'}`}>Beta</span>
+            <span className={'text-[10px] font-semibold tracking-widest uppercase ml-1 ' + (dark ? 'text-slate-600' : 'text-slate-400')}>Beta</span>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Lang toggle */}
-            <button
-              onClick={() => setLang(l => l === 'es' ? 'en' : 'es')}
-              className={`h-9 px-3 flex items-center justify-center rounded-lg border text-xs font-bold tracking-widest transition-all ${
-                dark
-                  ? 'border-white/10 text-slate-400 hover:text-white hover:border-white/20'
-                  : 'border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-            >
+          <div className="flex items-center gap-2">
+            <button onClick={() => setLang(lang === 'es' ? 'en' : 'es')}
+              className={'h-9 px-3 flex items-center justify-center rounded-lg border text-xs font-bold tracking-widest transition-all ' + toggleCls}>
               {lang === 'es' ? 'EN' : 'ES'}
             </button>
-            {/* Theme toggle */}
-            <button
-              onClick={() => setDark(!dark)}
-              className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all ${
-                dark
-                  ? 'border-white/10 text-slate-400 hover:text-white hover:border-white/20'
-                  : 'border-slate-200 text-slate-400 hover:text-slate-700 hover:border-slate-300'
-              }`}
-              aria-label="Toggle theme"
-            >
+            <button onClick={() => setDark(!dark)}
+              className={'w-9 h-9 flex items-center justify-center rounded-lg border transition-all ' + toggleCls}>
               {dark ? <IconSun /> : <IconMoon />}
             </button>
-            <button
-              onClick={handleConnect}
-              disabled={connecting}
-              className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all disabled:opacity-50 ${
-                dark
-                  ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
-                  : 'border-emerald-500 text-emerald-600 hover:bg-emerald-50'
-              }`}
-            >
-              {connecting ? {lang === 'es' ? 'Conectando...' : 'Connecting...'} : {lang === 'es' ? 'Conectar tienda' : 'Connect store'}}
+            <button onClick={handleConnect} disabled={connecting}
+              className={'hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all disabled:opacity-50 ' + (dark ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10' : 'border-emerald-500 text-emerald-600 hover:bg-emerald-50')}>
+              {connecting ? tx.connecting : tx.navCta}
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero */}
       <section className="relative z-10 pt-20 pb-16 px-6">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${pill}`}>
+          <div className={'inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ' + pill}>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Analisis de margenes para TiendaNube
+            {tx.badge}
           </div>
-
-          <h1 className={`text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] ${heading}`}>
-            {lang === 'es' ? 'Cuanto estas' : 'How much are you'}{' '}
+          <h1 className={'text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] ' + heading}>
+            {tx.h1a}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-400">
-              {lang === 'es' ? 'perdiendo' : 'losing'}
+              {tx.h1b}
             </span>
-            <br />{lang === 'es' ? 'sin saberlo?' : 'without knowing it?'}
+            <br />{tx.h1c}
           </h1>
-
-          <p className={`text-lg max-w-xl mx-auto leading-relaxed ${body}`}>
-            {lang === 'es' ? 'Tus margenes reales son' : 'Your real margins are'}{' '}
-            <span className={`font-semibold ${heading}`}>{lang === 'es' ? '5-8% mas bajos' : '5-8% lower'}</span> {lang === 'es' ? 'de lo que crees.' : 'than you think.'}
-            Las comisiones de TiendaNube y la pasarela se comen tu ganancia producto a producto.
+          <p className={'text-lg max-w-xl mx-auto leading-relaxed ' + body}>
+            {tx.sub}{' '}
+            <span className={'font-semibold ' + heading}>{tx.subBold}</span>{' '}
+            {tx.subEnd}
           </p>
-
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <button
-              onClick={handleConnect}
-              disabled={connecting}
-              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-60"
-            >
-              {connecting ? (
-                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Conectando...</>
-              ) : (
-                <>{lang === 'es' ? 'Conectar mi tienda gratis' : 'Connect my store free'} <IconArrow /></>
-              )}
+            <button onClick={handleConnect} disabled={connecting}
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-60">
+              {connecting
+                ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {tx.connecting}</>
+                : <>{tx.cta} <IconArrow /></>
+              }
             </button>
-            <a
-              href="/demo"
-              className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl border font-semibold text-base transition-all ${
-                dark
-                  ? 'border-white/15 text-slate-200 hover:border-white/30 hover:bg-white/5'
-                  : 'border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-100'
-              }`}
-            >
-              Ver demo
+            <a href="/demo" className={'w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl border font-semibold text-base transition-all ' + demoBtnCls}>
+              {tx.demo}
             </a>
           </div>
-
           {connectError && (
             <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
               <span className="font-bold">Error:</span> {connectError}
@@ -308,55 +343,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className={`relative z-10 py-10 px-6 border-y ${sec}`}>
+      <section className={'relative z-10 py-10 px-6 border-y ' + sec}>
         <div className="max-w-4xl mx-auto grid grid-cols-3 gap-6 text-center">
           {[
-            { value: '5.49%', label: 'Comision minima real',  sub: 'TN 2% + pasarela 3.49%' },
-            { value: '28%',   label: 'Productos en riesgo',   sub: 'Promedio tiendas LATAM'  },
-            { value: '3 min', label: 'Para ver tus numeros',  sub: 'Sin setup complejo'       },
+            { value: '5.49%', label: tx.s1l, sub: tx.s1s },
+            { value: '28%',   label: tx.s2l, sub: tx.s2s },
+            { value: '3 min', label: tx.s3l, sub: tx.s3s },
           ].map(s => (
             <div key={s.value} className="space-y-1">
-              <div className={`text-2xl sm:text-3xl font-black ${statVal}`}>{s.value}</div>
-              <div className={`text-sm font-semibold ${heading}`}>{s.label}</div>
-              <div className={`text-xs ${statSub}`}>{s.sub}</div>
+              <div className={'text-2xl sm:text-3xl font-black ' + statVal}>{s.value}</div>
+              <div className={'text-sm font-semibold ' + heading}>{s.label}</div>
+              <div className={'text-xs ' + statSub}>{s.sub}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Simulator */}
       <section className="relative z-10 py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>{lang === 'es' ? {lang === 'es' ? 'Calcula tu perdida ahora' : 'Calculate your loss now'} : 'Calculate your loss now'}</h2>
-            <p className={`text-sm ${muted}`}>{lang === 'es' ? {lang === 'es' ? 'Sin registrarte. Solo dos numeros.' : 'No sign-up. Just two numbers.'} : 'No sign-up. Just two numbers.'}</p>
+            <h2 className={'text-2xl sm:text-3xl font-black mb-3 ' + heading}>{tx.simTitle}</h2>
+            <p className={'text-sm ' + muted}>{tx.simSub}</p>
           </div>
-          <Simulator onConnect={handleConnect} dark={dark} lang={lang} />
+          <Simulator onConnect={handleConnect} dark={dark} tx={tx} />
         </div>
       </section>
 
-      {/* How it works */}
-      <section className={`relative z-10 py-20 px-6 border-t ${sec}`}>
+      <section className={'relative z-10 py-20 px-6 border-t ' + sec}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>{lang === 'es' ? {lang === 'es' ? 'Como funciona' : 'How it works'} : 'How it works'}</h2>
-            <p className={`text-sm ${muted}`}>{lang === 'es' ? {lang === 'es' ? 'De cero a decisiones de precio en 4 pasos.' : 'From zero to pricing decisions in 4 steps.'} : 'From zero to pricing decisions in 4 steps.'}</p>
+            <h2 className={'text-2xl sm:text-3xl font-black mb-3 ' + heading}>{tx.howTitle}</h2>
+            <p className={'text-sm ' + muted}>{tx.howSub}</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-5">
-            {[
-              { n: '01', title: 'Conectas tu TiendaNube',    body: 'OAuth seguro. LETO lee tu catalogo y precios, nunca modifica nada sin tu aprobacion.' },
-              { n: '02', title: 'Cargas tus costos reales',  body: 'Subis un Excel con el costo de cada producto, o los cargas uno por uno.' },
-              { n: '03', title: 'LETO calcula el margen real', body: 'Suma comisiones TN + pasarela + envio. Te dice exactamente que productos te hacen perder dinero.' },
-              { n: '04', title: 'Tomas accion con 1 click',  body: 'Para cada problema, LETO te da 3 opciones claras. Vos eleges y confirmas, LETO ejecuta.' },
-            ].map(step => (
-              <div key={step.n} className={`border rounded-2xl p-6 flex gap-4 transition-all group ${card}`}>
-                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-xs font-black flex-shrink-0 transition-all ${iconBg}`}>
+            {tx.steps.map(step => (
+              <div key={step.n} className={'border rounded-2xl p-6 flex gap-4 transition-all group ' + card}>
+                <div className={'w-10 h-10 rounded-xl border flex items-center justify-center text-xs font-black flex-shrink-0 transition-all ' + iconBg}>
                   {step.n}
                 </div>
                 <div>
-                  <p className={`font-bold mb-1 ${heading}`}>{step.title}</p>
-                  <p className={`text-sm leading-relaxed ${body}`}>{step.body}</p>
+                  <p className={'font-bold mb-1 ' + heading}>{step.title}</p>
+                  <p className={'text-sm leading-relaxed ' + body}>{step.body}</p>
                 </div>
               </div>
             ))}
@@ -364,41 +391,34 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className={`relative z-10 py-20 px-6 border-t ${sec}`}>
+      <section className={'relative z-10 py-20 px-6 border-t ' + sec}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>{lang === 'es' ? {lang === 'es' ? 'Todo lo que necesitas' : 'Everything you need'} : 'Everything you need'}</h2>
+            <h2 className={'text-2xl sm:text-3xl font-black mb-3 ' + heading}>{tx.featTitle}</h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { icon: <IconChart />, title: 'Margenes reales en tiempo real', body: 'Ve exactamente cuanto ganas en cada producto despues de todas las comisiones.' },
-              { icon: <IconZap />,   title: 'Recomendaciones concretas',      body: '3 opciones por producto problematico: subir precio, liquidar, o pausar.' },
-              { icon: <IconShield />,title: 'Autopilot con guardrails',        body: 'Ajustes automaticos dentro de los limites que vos configuras.' },
+              { icon: <IconChart />, ...tx.feats[0] },
+              { icon: <IconZap />,   ...tx.feats[1] },
+              { icon: <IconShield />, ...tx.feats[2] },
             ].map(f => (
-              <div key={f.title} className={`border rounded-2xl p-6 space-y-3 transition-all ${card}`}>
-                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${featIconBg}`}>
+              <div key={f.title} className={'border rounded-2xl p-6 space-y-3 transition-all ' + card}>
+                <div className={'w-10 h-10 rounded-xl border flex items-center justify-center ' + featIcon}>
                   {f.icon}
                 </div>
-                <p className={`font-bold ${heading}`}>{f.title}</p>
-                <p className={`text-sm leading-relaxed ${body}`}>{f.body}</p>
+                <p className={'font-bold ' + heading}>{f.title}</p>
+                <p className={'text-sm leading-relaxed ' + body}>{f.body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Trust */}
-      <section className={`relative z-10 py-10 px-6 border-t ${sec}`}>
+      <section className={'relative z-10 py-10 px-6 border-t ' + sec}>
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-          {[
-            'Solo lectura al catalogo',
-            'Cambios solo con tu aprobacion',
-            'Sin tarjeta de credito',
-            'Datos encriptados',
-          ].map(item => (
-            <div key={item} className={`flex items-center gap-2 text-sm ${trustItem}`}>
-              <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${featIconBg}`}>
+          {tx.trust.map(item => (
+            <div key={item} className={'flex items-center gap-2 text-sm ' + muted}>
+              <div className={'w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ' + featIcon}>
                 <IconCheck />
               </div>
               {item}
@@ -407,37 +427,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA final */}
-      <section className={`relative z-10 py-24 px-6 border-t ${sec}`}>
+      <section className={'relative z-10 py-24 px-6 border-t ' + sec}>
         <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h2 className={`text-3xl sm:text-4xl font-black ${heading}`}>{lang === 'es' ? {lang === 'es' ? 'Empieza a ver tus numeros reales' : 'Start seeing your real numbers'} : 'Start seeing your real numbers'}</h2>
-          <p className={muted}>{lang === 'es' ? {lang === 'es' ? 'Conecta tu tienda en 3 minutos. Sin setup. Sin tarjeta.' : 'Connect your store in 3 minutes. No setup. No credit card.'} : 'Connect your store in 3 minutes. No setup. No credit card.'}</p>
-          <button
-            onClick={handleConnect}
-            disabled={connecting}
-            className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-60"
-          >
-            {connecting ? (
-              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Conectando...</>
-            ) : (
-              <>{lang === 'es' ? 'Conectar con TiendaNube' : 'Connect with TiendaNube'} <IconArrow /></>
-            )}
+          <h2 className={'text-3xl sm:text-4xl font-black ' + heading}>{tx.ctaTitle}</h2>
+          <p className={muted}>{tx.ctaSub}</p>
+          <button onClick={handleConnect} disabled={connecting}
+            className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-60">
+            {connecting
+              ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {tx.connecting}</>
+              : <>{tx.ctaBtn} <IconArrow /></>
+            }
           </button>
           {connectError && <p className="text-sm text-red-500">{connectError}</p>}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className={`relative z-10 border-t py-8 px-6 ${sec}`}>
+      <footer className={'relative z-10 border-t py-8 px-6 ' + sec}>
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <LetoLogo size={22} showWordmark={false} />
-            <span className={`text-xs ${statSub}`}>2026 LETO Corp</span>
+            <span className={'text-xs ' + statSub}>2026 LETO Corp</span>
           </div>
-          <div className={`flex items-center gap-6 text-xs ${statSub}`}>
+          <div className={'flex items-center gap-6 text-xs ' + statSub}>
             <a href="mailto:contact@letocorp.com" className="hover:text-emerald-500 transition-colors">contact@letocorp.com</a>
-            <a href="/terms" className="hover:text-emerald-500 transition-colors">{lang === 'es' ? {lang === 'es' ? 'Terminos' : 'Terms'} : 'Terms'}</a>
-            <a href="/privacy" className="hover:text-emerald-500 transition-colors">{lang === 'es' ? {lang === 'es' ? 'Privacidad' : 'Privacy'} : 'Privacy'}</a>
+            <a href="/terms" className="hover:text-emerald-500 transition-colors">{tx.terms}</a>
+            <a href="/privacy" className="hover:text-emerald-500 transition-colors">{tx.privacy}</a>
           </div>
         </div>
       </footer>
@@ -445,9 +459,8 @@ export default function Home() {
       {IS_DEV && (
         <div className="fixed bottom-4 right-4 z-50">
           <button
-            onClick={() => window.location.href = `${API_BASE}/api/v1/auth/dev-login`}
-            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs hover:text-white transition-colors"
-          >
+            onClick={() => { window.location.href = API_BASE + '/api/v1/auth/dev-login'; }}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs hover:text-white transition-colors">
             Dev login
           </button>
         </div>
