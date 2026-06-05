@@ -27,7 +27,7 @@ import {
 } from 'recharts';
 
 // ── Brand colors ───────────────────────────────────────────────────────────
-const GREEN  = '#10B981';
+const GREEN  = '#15803d';
 const RED    = '#D64545';
 const AMBER  = '#b45309';
 
@@ -137,10 +137,10 @@ const Icon = {
 function SyncButton() {
   const { mutate, isPending, isSuccess, isError, reset } = useSyncStore();
 
-  const style = isPending ? 'text-[#10B981] border-[#10B981]/40 cursor-wait'
-    : isSuccess            ? 'text-[#10B981] border-[#10B981]'
+  const style = isPending ? 'text-[#15803d] border-[#15803d]/40 cursor-wait'
+    : isSuccess            ? 'text-[#15803d] border-[#15803d]'
     : isError              ? 'text-[#D64545] border-[#D64545]/40'
-    :                        'text-slate-500 dark:text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40';
+    :                        'text-slate-500 dark:text-slate-400 hover:text-[#15803d] hover:border-[#15803d]/40';
 
   const handleClick = () => {
     if (isPending) return;
@@ -330,7 +330,7 @@ function PriorityList({ products, onSelect }: { products: Product[]; onSelect: (
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: marginColor(p.margin) }} />
               <div>
-                <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#10B981] transition-colors">{p.name}</p>
+                <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#15803d] transition-colors">{p.name}</p>
                 <p className="text-[10px] text-slate-400">{p.category}{p.sku ? ` · ${p.sku}` : ''}</p>
               </div>
             </div>
@@ -493,8 +493,8 @@ export default function Dashboard() {
               plan === 'pro'
                 ? 'bg-slate-900 dark:bg-white/10 text-white'
                 : plan === 'basic'
-                ? 'bg-[#10B981]/10 text-[#10B981] dark:bg-[#10B981]/20 dark:text-green-400'
-                : 'bg-slate-100 dark:bg-white/8 text-slate-500 hover:bg-[#10B981]/10 hover:text-[#10B981]'
+                ? 'bg-[#15803d]/10 text-[#15803d] dark:bg-[#15803d]/20 dark:text-green-400'
+                : 'bg-slate-100 dark:bg-white/8 text-slate-500 hover:bg-[#15803d]/10 hover:text-[#15803d]'
             }`}>
             {plan === 'free' ? (
               <>
@@ -515,7 +515,7 @@ export default function Dashboard() {
             {/* Export Excel */}
             <button onClick={handleExportExcel} disabled={exportingXlsx || products.length === 0}
               title="Exportar a Excel"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 transition-all disabled:opacity-40">
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#15803d] hover:border-[#15803d]/40 transition-all disabled:opacity-40">
               {exportingXlsx ? <Icon.Spin /> : (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -526,7 +526,7 @@ export default function Dashboard() {
 
             {/* Export PDF */}
             <button onClick={handleExport} disabled={exporting || !metrics}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 transition-all disabled:opacity-40">
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#15803d] hover:border-[#15803d]/40 transition-all disabled:opacity-40">
               {exporting ? <Icon.Spin /> : <Icon.Download />}
               <span className="hidden sm:block">{exporting ? 'Generando…' : 'PDF'}</span>
             </button>
@@ -547,7 +547,7 @@ export default function Dashboard() {
 
             {/* Settings — comisiones y envío */}
             <button onClick={() => setSettingsOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 transition-all">
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#15803d] hover:border-[#15803d]/40 transition-all">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/>
               </svg>
@@ -557,7 +557,7 @@ export default function Dashboard() {
             <SyncButton />
 
             <button onClick={toggleTheme}
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 transition-all">
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-[#15803d] hover:border-[#15803d]/40 transition-all">
               {theme === 'light' ? <Icon.Moon /> : <Icon.Sun />}
             </button>
 
@@ -843,7 +843,7 @@ export default function Dashboard() {
 
       {/* ── Toast: healthy product ───────────────────────────────── */}
       {healthyProduct && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-[#10B981] text-white text-sm font-medium shadow-lg">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-[#15803d] text-white text-sm font-medium shadow-lg">
           <Icon.Check />
           <span><strong>{healthyProduct}</strong> tiene buen margen — sin acción necesaria</span>
         </div>
@@ -888,7 +888,8 @@ export default function Dashboard() {
           currentMargin={rec.current_margin}
           options={rec.options ?? []}
           recommendedOption={rec.recommended_option}
-          costBreakdown={rec.cost_breakdown}          isOpen={!!selected}
+          costBreakdown={rec.cost_breakdown}
+          isOpen={!!selected}
           onClose={handleClose}
           onApply={() => { handleClose(); invalidateAll(); }}
         />

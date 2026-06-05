@@ -10,34 +10,34 @@ const IS_DEV   = process.env.NODE_ENV === 'development';
 
 const TEXTS = {
   es: {
-    badge: 'Analisis de margenes para TiendaNube',
-    h1a: 'Cuanto estas', h1b: 'perdiendo', h1c: 'sin saberlo?',
-    sub: 'Tus margenes reales son', subBold: '5-8% mas bajos', subEnd: 'de lo que crees. Las comisiones de TiendaNube y la pasarela se comen tu ganancia.',
+    badge: 'Análisis de márgenes para TiendaNube',
+    h1a: '¿Cuánto estás', h1b: 'perdiendo', h1c: 'sin saberlo?',
+    sub: 'Tus márgenes reales son', subBold: '5–8% más bajos', subEnd: 'de lo que creés. Las comisiones de TiendaNube y la pasarela se comen tu ganancia.',
     cta: 'Conectar mi tienda gratis', demo: 'Ver demo', navCta: 'Conectar tienda',
-    s1l: 'Comision minima real', s2l: 'Productos en riesgo', s3l: 'Para ver tus numeros',
+    s1l: 'Comisión mínima real', s2l: 'Productos en riesgo', s3l: 'Para ver tus números',
     s1s: 'TN 2% + pasarela 3.49%', s2s: 'Promedio tiendas LATAM', s3s: 'Sin setup complejo',
-    simTitle: 'Calcula tu perdida ahora', simSub: 'Sin registrarte. Solo dos numeros.',
+    simTitle: 'Calcula tu pérdida ahora', simSub: 'Sin registrarte. Solo dos números.',
     prod: 'PRODUCTOS', ticket: 'TICKET PROMEDIO',
-    calcBtn: 'Calcular mi perdida mensual', riskLabel: 'productos con margen negativo real',
-    riskSub: 'despues de comisiones TN + pasarela', lossLabel: 'Perdida mensual estimada',
-    simCta: 'Ver el numero exacto de mi tienda', simDisc: 'Estimacion basada en promedios de tiendas LATAM',
-    howTitle: 'Como funciona', howSub: 'De cero a decisiones de precio en 4 pasos.',
+    calcBtn: 'Calcular mi pérdida mensual', riskLabel: 'productos con margen negativo real',
+    riskSub: 'después de comisiones TN + pasarela', lossLabel: 'Pérdida mensual estimada',
+    simCta: 'Ver el número exacto de mi tienda', simDisc: 'Estimación basada en promedios de tiendas LATAM',
+    howTitle: 'Cómo funciona', howSub: 'De cero a decisiones de precio en 4 pasos.',
     steps: [
-      { n: '01', title: 'Conectas tu TiendaNube',     body: 'OAuth seguro. LETO lee tu catalogo y precios, nunca modifica nada sin tu aprobacion.' },
-      { n: '02', title: 'Cargas tus costos reales',   body: 'Subis un Excel con el costo de cada producto, o los cargas uno por uno.' },
-      { n: '03', title: 'LETO calcula el margen real', body: 'Suma comisiones TN + pasarela + envio. Te dice exactamente que productos te hacen perder dinero.' },
-      { n: '04', title: 'Tomas accion con 1 click',   body: 'Para cada problema, LETO te da 3 opciones claras. Vos eleges y confirmas, LETO ejecuta.' },
+      { n: '01', title: 'Conectás tu TiendaNube',     body: 'OAuth seguro. LETO lee tu catálogo y precios, nunca modifica nada sin tu aprobación.' },
+      { n: '02', title: 'Cargás tus costos reales',   body: 'Subís un Excel con el costo de cada producto, o los cargás uno por uno.' },
+      { n: '03', title: 'LETO calcula el margen real', body: 'Suma comisiones TN + pasarela + envío. Te dice exactamente qué productos te hacen perder dinero.' },
+      { n: '04', title: 'Tomás acción con 1 click',   body: 'Para cada problema, LETO te da 3 opciones claras. Vos elegís y confirmás — LETO ejecuta.' },
     ],
-    featTitle: 'Todo lo que necesitas',
+    featTitle: 'Todo lo que necesitás',
     feats: [
-      { title: 'Margenes reales en tiempo real', body: 'Ve exactamente cuanto ganas en cada producto despues de todas las comisiones.' },
-      { title: 'Recomendaciones concretas',      body: '3 opciones por producto problematico: subir precio, liquidar, o pausar.' },
-      { title: 'Autopilot con guardrails',       body: 'Ajustes automaticos dentro de los limites que vos configuras.' },
+      { title: 'Márgenes reales en tiempo real', body: 'Ves exactamente cuánto ganás en cada producto después de todas las comisiones.' },
+      { title: 'Recomendaciones concretas',      body: '3 opciones por producto problemático: subir precio, liquidar o pausar.' },
+      { title: 'Autopilot con guardrails',       body: 'Ajustes automáticos dentro de los límites que vos configurás.' },
     ],
-    trust: ['Solo lectura al catalogo', 'Cambios solo con tu aprobacion', 'Sin tarjeta de credito', 'Datos encriptados'],
-    ctaTitle: 'Empieza a ver tus numeros reales', ctaSub: 'Conecta tu tienda en 3 minutos. Sin setup. Sin tarjeta.',
+    trust: ['Solo lectura al catálogo', 'Cambios solo con tu aprobación', 'Sin tarjeta de crédito', 'Datos encriptados'],
+    ctaTitle: 'Empezá a ver tus números reales', ctaSub: 'Conectá tu tienda en 3 minutos. Sin setup. Sin tarjeta.',
     ctaBtn: 'Conectar con TiendaNube', connecting: 'Conectando...',
-    terms: 'Terminos', privacy: 'Privacidad',
+    terms: 'Términos', privacy: 'Privacidad',
     errBackend: 'No se puede conectar al backend.',
   },
   en: {
@@ -137,8 +137,8 @@ function Simulator({ onConnect, dark, tx }: SimProps) {
   const sim = calcSim(products, avgTicket);
 
   const inputCls = dark
-    ? 'w-full px-4 py-3 rounded-xl border border-white/15 text-white text-lg font-bold focus:outline-none focus:border-emerald-500/60 transition-all'
-    : 'w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-lg font-bold focus:outline-none focus:border-emerald-500 transition-all';
+    ? 'w-full px-4 py-3 rounded-xl border border-white/15 text-white text-lg font-bold focus:outline-none focus:border-[#15803d]/60 transition-all'
+    : 'w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-lg font-bold focus:outline-none focus:border-[#15803d] transition-all';
 
   const inputStyle = dark
     ? { background: 'rgba(255,255,255,0.08)' }
@@ -179,7 +179,7 @@ function Simulator({ onConnect, dark, tx }: SimProps) {
 
         {!revealed ? (
           <button onClick={() => setRevealed(true)}
-            className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/20">
+            className="w-full py-3.5 rounded-xl bg-[#15803d] hover:bg-[#166534] text-white text-sm font-bold transition-all shadow-lg shadow-[#15803d]/20">
             {tx.calcBtn} →
           </button>
         ) : (
@@ -200,7 +200,7 @@ function Simulator({ onConnect, dark, tx }: SimProps) {
               </div>
             </div>
             <button onClick={onConnect}
-              className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+              className="w-full py-3.5 rounded-xl bg-[#15803d] hover:bg-[#166534] text-white text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#15803d]/20">
               {tx.simCta} <IconArrow />
             </button>
             <p className={'text-center text-[11px] ' + (dark ? 'text-slate-500' : 'text-slate-400')}>{tx.simDisc}</p>
@@ -235,7 +235,7 @@ export default function Home() {
       if (result?.authorization_url) {
         window.location.href = result.authorization_url;
       } else {
-        setConnectError('El backend no devolvio una URL de autorizacion.');
+        setConnectError('El backend no devolvió una URL de autorización.');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error desconocido';
@@ -248,20 +248,20 @@ export default function Home() {
   if (isLoading || user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white dark:bg-[#060a06]">
-        <div className="w-7 h-7 rounded-full border-2 border-emerald-500/30 border-t-emerald-500 animate-spin" />
+        <div className="w-7 h-7 rounded-full border-2 border-[#15803d]/30 border-t-[#15803d] animate-spin" />
       </div>
     );
   }
 
   const bg       = dark ? 'bg-[#060a06] text-white'  : 'bg-slate-50 text-slate-900';
   const navCls   = dark ? 'border-white/6 bg-[#060a06]/90 backdrop-blur-md' : 'border-slate-200 bg-white/90 backdrop-blur-md';
-  const pill     = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700';
+  const pill     = dark ? 'bg-[#15803d]/10 border-[#15803d]/20 text-[#15803d]' : 'bg-[#15803d]/10 border-[#15803d]/30 text-[#15803d]';
   const sec      = dark ? 'border-white/6'            : 'border-slate-200';
-  const card     = dark ? 'bg-white/3 border-white/8 hover:bg-white/5 hover:border-white/15' : 'bg-white border-slate-200 hover:border-emerald-200 hover:shadow-sm';
-  const statVal  = dark ? 'text-emerald-400'          : 'text-emerald-600';
+  const card     = dark ? 'bg-white/3 border-white/8 hover:bg-white/5 hover:border-white/15' : 'bg-white border-slate-200 hover:border-[#15803d]/20 hover:shadow-sm';
+  const statVal  = dark ? 'text-[#15803d]'          : 'text-[#15803d]';
   const statSub  = dark ? 'text-slate-500'            : 'text-slate-400';
-  const iconBg   = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500/20' : 'bg-emerald-50 border-emerald-200 text-emerald-600 group-hover:bg-emerald-100';
-  const featIcon = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-600';
+  const iconBg   = dark ? 'bg-[#15803d]/10 border-[#15803d]/20 text-[#15803d] group-hover:bg-[#15803d]/20' : 'bg-[#15803d]/8 border-[#15803d]/20 text-[#15803d] group-hover:bg-[#15803d]/15';
+  const featIcon = dark ? 'bg-[#15803d]/10 border-[#15803d]/20 text-[#15803d]' : 'bg-[#15803d]/8 border-[#15803d]/20 text-[#15803d]';
   const heading  = dark ? 'text-white'                : 'text-slate-900';
   const body     = dark ? 'text-slate-400'            : 'text-slate-600';
   const muted    = dark ? 'text-slate-400'            : 'text-slate-500';
@@ -298,7 +298,7 @@ export default function Home() {
               {dark ? <IconSun /> : <IconMoon />}
             </button>
             <button onClick={handleConnect} disabled={connecting}
-              className={'hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all disabled:opacity-50 ' + (dark ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10' : 'border-emerald-500 text-emerald-600 hover:bg-emerald-50')}>
+              className={'hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all disabled:opacity-50 ' + (dark ? 'border-[#15803d]/40 text-[#15803d] hover:bg-[#15803d]/10' : 'border-[#15803d] text-[#15803d] hover:bg-[#15803d]/5')}>
               {connecting ? tx.connecting : tx.navCta}
             </button>
           </div>
@@ -308,12 +308,12 @@ export default function Home() {
       <section className="relative z-10 pt-20 pb-16 px-6">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <div className={'inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ' + pill}>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#15803d] animate-pulse" />
             {tx.badge}
           </div>
           <h1 className={'text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] ' + heading}>
             {tx.h1a}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-400">
+            <span className="text-[#15803d]">
               {tx.h1b}
             </span>
             <br />{tx.h1c}
@@ -325,7 +325,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <button onClick={handleConnect} disabled={connecting}
-              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-60">
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-[#15803d] hover:bg-[#166534] text-white font-bold text-base transition-all shadow-xl shadow-[#15803d]/20 disabled:opacity-60">
               {connecting
                 ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {tx.connecting}</>
                 : <>{tx.cta} <IconArrow /></>
@@ -432,7 +432,7 @@ export default function Home() {
           <h2 className={'text-3xl sm:text-4xl font-black ' + heading}>{tx.ctaTitle}</h2>
           <p className={muted}>{tx.ctaSub}</p>
           <button onClick={handleConnect} disabled={connecting}
-            className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-60">
+            className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-[#15803d] hover:bg-[#166534] text-white font-bold text-base transition-all shadow-xl shadow-[#15803d]/20 disabled:opacity-60">
             {connecting
               ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {tx.connecting}</>
               : <>{tx.ctaBtn} <IconArrow /></>
@@ -449,9 +449,9 @@ export default function Home() {
             <span className={'text-xs ' + statSub}>2026 LETO Corp</span>
           </div>
           <div className={'flex items-center gap-6 text-xs ' + statSub}>
-            <a href="mailto:contact@letocorp.com" className="hover:text-emerald-500 transition-colors">contact@letocorp.com</a>
-            <a href="/terms" className="hover:text-emerald-500 transition-colors">{tx.terms}</a>
-            <a href="/privacy" className="hover:text-emerald-500 transition-colors">{tx.privacy}</a>
+            <a href="mailto:contact@letocorp.com" className="hover:text-[#15803d] transition-colors">contact@letocorp.com</a>
+            <a href="/terms" className="hover:text-[#15803d] transition-colors">{tx.terms}</a>
+            <a href="/privacy" className="hover:text-[#15803d] transition-colors">{tx.privacy}</a>
           </div>
         </div>
       </footer>

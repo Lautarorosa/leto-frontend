@@ -27,7 +27,7 @@ interface CalcResult {
   store_commissions_pct: number;
 }
 
-const GREEN = '#10B981';
+const GREEN = '#15803d';
 const RED   = '#D64545';
 const AMBER = '#b45309';
 
@@ -134,7 +134,7 @@ export function PriceCalculatorModal({ product, isOpen, onClose }: Props) {
                   min={0} max={95} step={1}
                   value={targetMargin}
                   onChange={(e) => setTargetMargin(Math.min(95, Math.max(0, Number(e.target.value))))}
-                  className="w-14 text-center text-sm font-bold rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white py-1 focus:outline-none focus:ring-1 focus:ring-[#10B981]/40"
+                  className="w-14 text-center text-sm font-bold rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white py-1 focus:outline-none focus:ring-1 focus:ring-[#15803d]/40"
                 />
                 <span className="text-sm font-bold text-slate-500">%</span>
               </div>

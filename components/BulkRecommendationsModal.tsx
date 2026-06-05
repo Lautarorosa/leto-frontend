@@ -23,7 +23,7 @@ interface BulkResult {
              old_price?: number; new_price?: number; old_margin?: number }[];
 }
 
-const GREEN = '#10B981';
+const GREEN = '#15803d';
 const RED   = '#D64545';
 const AMBER = '#b45309';
 

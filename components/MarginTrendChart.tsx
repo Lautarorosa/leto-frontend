@@ -22,7 +22,7 @@ interface HistoryPoint {
   potential_gain: number;
 }
 
-const GREEN = '#10B981';
+const GREEN = '#15803d';
 const RED   = '#D64545';
 
 function fmtDate(d: string) {
@@ -102,7 +102,7 @@ export function MarginTrendChart() {
         {totalPotential > 0 && (
           <div className="text-right">
             <p className="text-[10px] text-slate-400 uppercase tracking-wide">Potencial mensual</p>
-            <p className="text-sm font-bold text-[#10B981]">+{fmtMoney(totalPotential)}</p>
+            <p className="text-sm font-bold text-[#15803d]">+{fmtMoney(totalPotential)}</p>
             <p className="text-[10px] text-slate-400">si corriges márgenes</p>
           </div>
         )}

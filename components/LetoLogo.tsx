@@ -32,7 +32,7 @@ export default function LetoLogo({
       {showWordmark && (
         <span
           className="font-black tracking-widest uppercase select-none"
-          style={{ fontSize: size * 0.44, color: '#10B981', letterSpacing: '0.2em' }}
+          style={{ fontSize: size * 0.44, color: '#15803d', letterSpacing: '0.2em' }}
         >
           LETO
         </span>
