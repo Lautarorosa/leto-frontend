@@ -22,7 +22,7 @@ interface HistoryPoint {
   potential_gain: number;
 }
 
-const GREEN = '#16603D';
+const GREEN = '#10B981';
 const RED   = '#D64545';
 
 function fmtDate(d: string) {
@@ -94,7 +94,7 @@ export function MarginTrendChart() {
           </p>
           <div className="flex items-baseline gap-2 mt-1">
             <span className="text-2xl font-black" style={{ color: GREEN }}>{last.toFixed(1)}%</span>
-            <span className={`text-xs font-semibold ${delta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+            <span className={`text-xs font-semibold ${delta >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
               {delta >= 0 ? '↑' : '↓'} {Math.abs(delta).toFixed(1)}% vs hace 30d
             </span>
           </div>
@@ -102,7 +102,7 @@ export function MarginTrendChart() {
         {totalPotential > 0 && (
           <div className="text-right">
             <p className="text-[10px] text-slate-400 uppercase tracking-wide">Potencial mensual</p>
-            <p className="text-sm font-bold text-[#16603D]">+{fmtMoney(totalPotential)}</p>
+            <p className="text-sm font-bold text-[#10B981]">+{fmtMoney(totalPotential)}</p>
             <p className="text-[10px] text-slate-400">si corriges márgenes</p>
           </div>
         )}

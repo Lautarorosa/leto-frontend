@@ -23,7 +23,7 @@ interface BulkResult {
              old_price?: number; new_price?: number; old_margin?: number }[];
 }
 
-const GREEN = '#16603D';
+const GREEN = '#10B981';
 const RED   = '#D64545';
 const AMBER = '#b45309';
 
@@ -150,7 +150,7 @@ export function BulkRecommendationsModal({ products, isOpen, onClose, onApplied 
 
               {targets.length === 0 ? (
                 <div className="py-8 text-center">
-                  <p className="text-sm font-medium text-green-600">
+                  <p className="text-sm font-medium text-emerald-500">
                     ✓ Todos los productos con costo tienen buen margen
                   </p>
                   <p className="text-xs text-slate-400 mt-1">No hay acciones necesarias</p>

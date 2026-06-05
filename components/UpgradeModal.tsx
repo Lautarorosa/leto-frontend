@@ -15,7 +15,7 @@ interface Props {
   onUpgraded?: () => void;
 }
 
-const GREEN = '#1B5E3F';
+const GREEN = '#10B981';
 const plans = [
   {
     key: 'free',
@@ -138,7 +138,7 @@ export function UpgradeModal({ isOpen, onClose, highlightFeature, currentPlan = 
               <div key={plan.key}
                 className={`relative rounded-2xl border-2 p-5 flex flex-col transition-all ${
                   isPopular
-                    ? 'border-[#1B5E3F] shadow-lg shadow-[#1B5E3F]/10'
+                    ? 'border-[#10B981] shadow-lg shadow-[#10B981]/10'
                     : 'border-slate-200 dark:border-white/10'
                 }`}>
 

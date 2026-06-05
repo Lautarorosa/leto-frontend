@@ -50,8 +50,8 @@ interface RecommendationModalProps {
 }
 
 const SCENARIO_COLORS: Record<string, string> = {
-  'Mejor caso': '#16603D',
-  'Caso esperado': '#0f4a2d',
+  'Mejor caso': '#10B981',
+  'Caso esperado': '#059669',
   'Peor caso': '#D64545',
 };
 
@@ -109,7 +109,7 @@ function CostBreakdownPanel({ breakdown }: { breakdown: CostBreakdown }) {
               ${row.highlight
                 ? row.negative
                   ? 'bg-[#D64545]/5 dark:bg-[#D64545]/8'
-                  : 'bg-[#16603D]/5 dark:bg-[#16603D]/8'
+                  : 'bg-[#10B981]/5 dark:bg-[#10B981]/8'
                 : 'bg-white dark:bg-transparent'
               }`}
           >
@@ -124,7 +124,7 @@ function CostBreakdownPanel({ breakdown }: { breakdown: CostBreakdown }) {
               )}
               <span className={`font-semibold tabular-nums
                 ${row.highlight
-                  ? row.negative ? 'text-[#D64545]' : 'text-[#16603D]'
+                  ? row.negative ? 'text-[#D64545]' : 'text-[#10B981]'
                   : row.negative ? 'text-slate-600 dark:text-slate-300' : 'text-slate-900 dark:text-white'
                 }`}
               >
@@ -142,12 +142,12 @@ function CostBreakdownPanel({ breakdown }: { breakdown: CostBreakdown }) {
             className="h-full rounded-full transition-all"
             style={{
               width: `${Math.min(Math.max(breakdown.margin_pct, 0), 100)}%`,
-              backgroundColor: breakdown.margin_pct < 0 ? '#D64545' : breakdown.margin_pct < 20 ? '#b45309' : '#16603D',
+              backgroundColor: breakdown.margin_pct < 0 ? '#D64545' : breakdown.margin_pct < 20 ? '#b45309' : '#10B981',
             }}
           />
         </div>
         <span className={`text-xs font-bold tabular-nums w-12 text-right
-          ${breakdown.margin_pct < 0 ? 'text-[#D64545]' : breakdown.margin_pct < 20 ? 'text-amber-600' : 'text-[#16603D]'}`}
+          ${breakdown.margin_pct < 0 ? 'text-[#D64545]' : breakdown.margin_pct < 20 ? 'text-amber-600' : 'text-[#10B981]'}`}
         >
           {breakdown.margin_pct.toFixed(1)}%
         </span>
@@ -182,9 +182,9 @@ function PriceCalculator({ breakdown }: { breakdown: CostBreakdown }) {
               max={80}
               value={targetMargin}
               onChange={e => setTargetMargin(Number(e.target.value))}
-              className="w-28 accent-[#16603D]"
+              className="w-28 accent-[#10B981]"
             />
-            <span className="text-sm font-bold text-[#16603D] w-10 text-right tabular-nums">{targetMargin}%</span>
+            <span className="text-sm font-bold text-[#10B981] w-10 text-right tabular-nums">{targetMargin}%</span>
           </div>
         </div>
 
@@ -198,7 +198,7 @@ function PriceCalculator({ breakdown }: { breakdown: CostBreakdown }) {
                 </p>
               </div>
               {delta !== null && deltaPct !== null && (
-                <div className={`text-right ${delta > 0 ? 'text-amber-600' : 'text-[#16603D]'}`}>
+                <div className={`text-right ${delta > 0 ? 'text-amber-600' : 'text-[#10B981]'}`}>
                   <p className="text-xs mb-1 text-slate-400">vs precio actual</p>
                   <p className="text-lg font-bold tabular-nums">
                     {delta > 0 ? '+' : ''}{delta.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -297,7 +297,7 @@ export function RecommendationModal({
 
   const riskLabel = (level: string) => ({ Low: 'Bajo riesgo', Medium: 'Riesgo moderado' }[level] ?? 'Alto riesgo');
   const riskColor = (level: string) => ({
-    Low: 'text-[#16603D] bg-[#16603D]/8',
+    Low: 'text-[#10B981] bg-[#10B981]/8',
     Medium: 'text-amber-600 bg-amber-500/8',
   }[level] ?? 'text-[#D64545] bg-[#D64545]/8');
 
@@ -342,14 +342,14 @@ export function RecommendationModal({
         <div className="flex items-start justify-between gap-4 p-6 border-b border-slate-100 dark:border-white/8">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-4 h-px bg-[#16603D]" />
-              <span className="text-xs font-bold tracking-widest text-[#16603D] uppercase">Recomendaciones</span>
+              <div className="w-4 h-px bg-[#10B981]" />
+              <span className="text-xs font-bold tracking-widest text-[#10B981] uppercase">Recomendaciones</span>
             </div>
             <h2 className="text-xl font-black text-slate-900 dark:text-white">{productName}</h2>
             <div className="flex items-center gap-3 mt-1">
               <p className="text-sm">
                 <span className="text-slate-400">Margen actual: </span>
-                <span className={`font-bold ${currentMargin < 0 ? 'text-[#D64545]' : 'text-[#16603D]'}`}>
+                <span className={`font-bold ${currentMargin < 0 ? 'text-[#D64545]' : 'text-[#10B981]'}`}>
                   {currentMargin.toFixed(2)}%
                 </span>
               </p>
@@ -358,7 +358,7 @@ export function RecommendationModal({
                   <span className="text-slate-300 dark:text-white/20">→</span>
                   <p className="text-sm">
                     <span className="text-slate-400">Proyectado: </span>
-                    <span className={`font-bold ${projectedMargin < 0 ? 'text-[#D64545]' : projectedMargin < 20 ? 'text-amber-600' : 'text-[#16603D]'}`}>
+                    <span className={`font-bold ${projectedMargin < 0 ? 'text-[#D64545]' : projectedMargin < 20 ? 'text-amber-600' : 'text-[#10B981]'}`}>
                       {projectedMargin}%
                     </span>
                   </p>
@@ -401,7 +401,7 @@ export function RecommendationModal({
                 key={option.option_id}
                 className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                   selectedOption === option.option_id
-                    ? 'border-[#16603D] bg-[#16603D]/5 dark:bg-[#16603D]/10'
+                    ? 'border-[#10B981] bg-[#10B981]/5 dark:bg-[#10B981]/10'
                     : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 bg-white dark:bg-transparent'
                 }`}
               >
@@ -411,11 +411,11 @@ export function RecommendationModal({
                   value={option.option_id}
                   checked={selectedOption === option.option_id}
                   onChange={(e) => setSelectedOption(e.target.value)}
-                  className="mt-0.5 accent-[#16603D]"
+                  className="mt-0.5 accent-[#10B981]"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                    <span className="text-[#16603D]">{actionIcon(option.action_type)}</span>
+                    <span className="text-[#10B981]">{actionIcon(option.action_type)}</span>
                     <span className="font-bold text-sm text-slate-900 dark:text-white">
                       {actionLabel(option.action_type)}
                     </span>
@@ -423,7 +423,7 @@ export function RecommendationModal({
                       {riskLabel(option.risk_level)}
                     </span>
                     {option.option_id === recommendedOption && (
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-md text-[#16603D] bg-[#16603D]/10">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-md text-[#10B981] bg-[#10B981]/10">
                         Recomendada
                       </span>
                     )}
@@ -434,10 +434,10 @@ export function RecommendationModal({
                   {proj !== null && gain !== null && (
                     <div className="mt-2 flex items-center gap-2 text-xs">
                       <span className="text-slate-400">Margen esperado:</span>
-                      <span className={`font-bold ${proj < 0 ? 'text-[#D64545]' : proj < 20 ? 'text-amber-600' : 'text-[#16603D]'}`}>
+                      <span className={`font-bold ${proj < 0 ? 'text-[#D64545]' : proj < 20 ? 'text-amber-600' : 'text-[#10B981]'}`}>
                         {proj}%
                       </span>
-                      <span className={`${gain >= 0 ? 'text-[#16603D]' : 'text-[#D64545]'}`}>
+                      <span className={`${gain >= 0 ? 'text-[#10B981]' : 'text-[#D64545]'}`}>
                         ({gain >= 0 ? '+' : ''}{gain} pp)
                       </span>
                     </div>
@@ -469,7 +469,7 @@ export function RecommendationModal({
           <button
             onClick={handleApply}
             disabled={isApplying}
-            className="flex-1 px-4 py-2.5 rounded-lg bg-[#16603D] hover:bg-[#0f4a2d] text-sm font-semibold text-white disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2"
+            className="flex-1 px-4 py-2.5 rounded-lg bg-[#10B981] hover:bg-[#059669] text-sm font-semibold text-white disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2"
           >
             {isApplying ? (
               <>

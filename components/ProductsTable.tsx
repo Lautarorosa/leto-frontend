@@ -67,7 +67,7 @@ function MarginBadge({ margin }: { margin: number | null }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-sm font-bold text-[#16603D] bg-[#16603D]/8">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-sm font-bold text-[#10B981] bg-[#10B981]/8">
       {margin.toFixed(1)}%
       <span className="text-[10px] font-medium opacity-70">Bueno</span>
     </span>
@@ -146,7 +146,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
   if (isLoading) {
     return (
       <div className="py-20 text-center">
-        <div className="spinner border-[#16603D] mx-auto mb-4 h-8 w-8" />
+        <div className="spinner border-[#10B981] mx-auto mb-4 h-8 w-8" />
         <p className="text-slate-400 text-sm">Cargando productos...</p>
       </div>
     );
@@ -160,7 +160,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 border-b border-slate-100 dark:border-white/6">
           {[
             { label: 'Total productos',  value: stats?.total_products ?? 0,                  color: 'text-slate-900 dark:text-white' },
-            { label: 'Margen promedio',  value: `${(stats?.avg_margin ?? 0).toFixed(1)}%`,   color: 'text-[#16603D]' },
+            { label: 'Margen promedio',  value: `${(stats?.avg_margin ?? 0).toFixed(1)}%`,   color: 'text-[#10B981]' },
             { label: 'Críticos',         value: stats?.negative_margin ?? 0,                 color: (stats?.negative_margin ?? 0) > 0 ? 'text-[#D64545]' : 'text-slate-900 dark:text-white' },
             { label: 'Margen bajo',      value: stats?.low_margin ?? 0,                      color: (stats?.low_margin ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-white' },
           ].map((s) => (
@@ -187,7 +187,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Buscar producto, SKU o categoría…"
-              className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-slate-700 dark:text-slate-300 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#16603D]/40 focus:border-[#16603D]/60 transition-all"
+              className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-slate-700 dark:text-slate-300 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#10B981]/40 focus:border-[#10B981]/60 transition-all"
             />
           </div>
 
@@ -203,8 +203,8 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                 <button key={tab.id} onClick={() => setFilter(tab.id)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                     filter === tab.id
-                      ? 'bg-[#16603D] text-white'
-                      : 'border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#16603D]/50 hover:text-[#16603D]'
+                      ? 'bg-[#10B981] text-white'
+                      : 'border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#10B981]/50 hover:text-[#10B981]'
                   }`}>
                   {tab.label}
                 </button>
@@ -227,7 +227,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
               onClick={() => handleCategory(null)}
               className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                 activeCategory === null
-                  ? 'bg-[#16603D] text-white'
+                  ? 'bg-[#10B981] text-white'
                   : 'bg-slate-100 dark:bg-white/8 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/12'
               }`}>
               Todas
@@ -238,7 +238,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                 onClick={() => handleCategory(cat === activeCategory ? null : cat)}
                 className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                   activeCategory === cat
-                    ? 'bg-[#16603D] text-white'
+                    ? 'bg-[#10B981] text-white'
                     : 'bg-slate-100 dark:bg-white/8 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/12'
                 }`}>
                 {cat}
@@ -278,7 +278,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                   {/* Producto */}
                   <td className="px-4 py-3.5 pl-5">
                     <div>
-                      <p className="font-semibold text-slate-900 dark:text-white text-sm group-hover:text-[#16603D] transition-colors">{product.name}</p>
+                      <p className="font-semibold text-slate-900 dark:text-white text-sm group-hover:text-[#10B981] transition-colors">{product.name}</p>
                       {product.sku && <p className="text-[11px] text-slate-400 mt-0.5 font-mono">{product.sku}</p>}
                     </div>
                   </td>
@@ -290,8 +290,8 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                         onClick={() => handleCategory(product.category === activeCategory ? null : product.category)}
                         className={`px-2 py-0.5 rounded-md text-xs transition-colors ${
                           activeCategory === product.category
-                            ? 'bg-[#16603D] text-white'
-                            : 'bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-slate-300 hover:bg-[#16603D]/10 hover:text-[#16603D]'
+                            ? 'bg-[#10B981] text-white'
+                            : 'bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-slate-300 hover:bg-[#10B981]/10 hover:text-[#10B981]'
                         }`}
                       >
                         {product.category}
@@ -348,7 +348,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                         <button
                           onClick={() => setCalcProduct(product)}
                           title="Calculadora de precio"
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 text-xs font-medium transition-all"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 text-xs font-medium transition-all"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -360,7 +360,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                       <button
                         onClick={() => onSelectProduct?.(product)}
                         disabled={product.margin === null}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#16603D] hover:bg-[#0f4a2d] disabled:bg-slate-200 dark:disabled:bg-white/8 disabled:cursor-not-allowed text-white disabled:text-slate-400 text-xs font-semibold transition-all"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#10B981] hover:bg-[#059669] disabled:bg-slate-200 dark:disabled:bg-white/8 disabled:cursor-not-allowed text-white disabled:text-slate-400 text-xs font-semibold transition-all"
                         aria-label={`Ver recomendaciones para ${product.name}`}
                       >
                         {product.margin === null ? 'Sin costo' : 'Ver opciones'}
@@ -387,7 +387,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
               <button
                 onClick={() => handlePage(page - 1)}
                 disabled={page === 0}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#16603D]/50 hover:text-[#16603D] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#10B981]/50 hover:text-[#10B981] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 ← Anterior
               </button>
@@ -397,7 +397,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
               <button
                 onClick={() => handlePage(page + 1)}
                 disabled={page >= totalPages - 1}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#16603D]/50 hover:text-[#16603D] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#10B981]/50 hover:text-[#10B981] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Siguiente →
               </button>
@@ -411,7 +411,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
             {activeCategory ? `Sin productos en "${activeCategory}".` : 'No se encontraron productos.'}
           </p>
           {activeCategory && (
-            <button onClick={() => handleCategory(null)} className="text-xs text-[#16603D] mt-2 hover:underline">
+            <button onClick={() => handleCategory(null)} className="text-xs text-[#10B981] mt-2 hover:underline">
               Quitar filtro de categoría
             </button>
           )}

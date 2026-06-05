@@ -61,7 +61,7 @@ const IconSun = () => (
   </svg>
 );
 
-function Simulator({ onConnect, dark }: { onConnect: () => void; dark: boolean }) {
+function Simulator({ onConnect, dark, lang }: { onConnect: () => void; dark: boolean; lang: 'es'|'en' }) {
   const [products,  setProducts]  = useState(80);
   const [avgTicket, setAvgTicket] = useState(4500);
   const [revealed,  setRevealed]  = useState(false);
@@ -118,13 +118,13 @@ function Simulator({ onConnect, dark }: { onConnect: () => void; dark: boolean }
                 <div className="text-red-500 flex-shrink-0"><IconWarning /></div>
                 <div>
                   <p className={`text-sm font-bold ${dark ? 'text-white' : 'text-slate-900'}`}>
-                    ~{sim.productsAtRisk} productos con margen negativo real
+                    ~{sim.productsAtRisk} {lang === 'es' ? 'productos con margen negativo real' : 'products with real negative margin'}
                   </p>
-                  <p className={`text-xs mt-0.5 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>después de comisiones TN + pasarela</p>
+                  <p className={`text-xs mt-0.5 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{lang === 'es' ? 'despues de comisiones TN + pasarela' : 'after TN + gateway fees'}</p>
                 </div>
               </div>
               <div className={`flex items-center justify-between pt-3 border-t ${dark ? 'border-red-500/15' : 'border-red-200'}`}>
-                <span className={`text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>Pérdida mensual estimada</span>
+                <span className={`text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{lang === 'es' ? 'Perdida mensual estimada' : 'Estimated monthly loss'}</span>
                 <span className="text-2xl font-black text-red-500">{fmtMoney(sim.estimatedLoss)}</span>
               </div>
             </div>
@@ -134,7 +134,7 @@ function Simulator({ onConnect, dark }: { onConnect: () => void; dark: boolean }
             >
               Ver el número exacto de mi tienda <IconArrow />
             </button>
-            <p className={`text-center text-[11px] ${dark ? 'text-slate-500' : 'text-slate-400'}`}>Estimación basada en promedios de tiendas LATAM</p>
+            <p className={`text-center text-[11px] ${dark ? 'text-slate-500' : 'text-slate-400'}`}>{lang === 'es' ? 'Estimacion basada en promedios de tiendas LATAM' : 'Estimate based on LATAM store averages'}</p>
           </div>
         )}
       </div>
@@ -148,6 +148,7 @@ export default function Home() {
   const [connecting,   setConnecting]   = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
   const [dark, setDark] = useState(true);
+  const [lang, setLang] = useState<'es'|'en'>('es');
 
   useEffect(() => {
     if (!isLoading && user) router.replace('/dashboard');
@@ -215,6 +216,17 @@ export default function Home() {
             <span className={`text-[10px] font-semibold tracking-widest uppercase ml-1 ${dark ? 'text-slate-600' : 'text-slate-400'}`}>Beta</span>
           </div>
           <div className="flex items-center gap-3">
+            {/* Lang toggle */}
+            <button
+              onClick={() => setLang(l => l === 'es' ? 'en' : 'es')}
+              className={`h-9 px-3 flex items-center justify-center rounded-lg border text-xs font-bold tracking-widest transition-all ${
+                dark
+                  ? 'border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                  : 'border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300'
+              }`}
+            >
+              {lang === 'es' ? 'EN' : 'ES'}
+            </button>
             {/* Theme toggle */}
             <button
               onClick={() => setDark(!dark)}
@@ -236,7 +248,7 @@ export default function Home() {
                   : 'border-emerald-500 text-emerald-600 hover:bg-emerald-50'
               }`}
             >
-              {connecting ? 'Conectando...' : 'Conectar tienda'}
+              {connecting ? {lang === 'es' ? 'Conectando...' : 'Connecting...'} : {lang === 'es' ? 'Conectar tienda' : 'Connect store'}}
             </button>
           </div>
         </div>
@@ -251,16 +263,16 @@ export default function Home() {
           </div>
 
           <h1 className={`text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] ${heading}`}>
-            Cuanto estas{' '}
+            {lang === 'es' ? 'Cuanto estas' : 'How much are you'}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-400">
-              perdiendo
+              {lang === 'es' ? 'perdiendo' : 'losing'}
             </span>
-            <br />sin saberlo?
+            <br />{lang === 'es' ? 'sin saberlo?' : 'without knowing it?'}
           </h1>
 
           <p className={`text-lg max-w-xl mx-auto leading-relaxed ${body}`}>
-            Tus margenes reales son{' '}
-            <span className={`font-semibold ${heading}`}>5-8% mas bajos</span> de lo que crees.
+            {lang === 'es' ? 'Tus margenes reales son' : 'Your real margins are'}{' '}
+            <span className={`font-semibold ${heading}`}>{lang === 'es' ? '5-8% mas bajos' : '5-8% lower'}</span> {lang === 'es' ? 'de lo que crees.' : 'than you think.'}
             Las comisiones de TiendaNube y la pasarela se comen tu ganancia producto a producto.
           </p>
 
@@ -273,7 +285,7 @@ export default function Home() {
               {connecting ? (
                 <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Conectando...</>
               ) : (
-                <>Conectar mi tienda gratis <IconArrow /></>
+                <>{lang === 'es' ? 'Conectar mi tienda gratis' : 'Connect my store free'} <IconArrow /></>
               )}
             </button>
             <a
@@ -317,10 +329,10 @@ export default function Home() {
       <section className="relative z-10 py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>Calcula tu perdida ahora</h2>
-            <p className={`text-sm ${muted}`}>Sin registrarte. Solo dos numeros.</p>
+            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>{lang === 'es' ? {lang === 'es' ? 'Calcula tu perdida ahora' : 'Calculate your loss now'} : 'Calculate your loss now'}</h2>
+            <p className={`text-sm ${muted}`}>{lang === 'es' ? {lang === 'es' ? 'Sin registrarte. Solo dos numeros.' : 'No sign-up. Just two numbers.'} : 'No sign-up. Just two numbers.'}</p>
           </div>
-          <Simulator onConnect={handleConnect} dark={dark} />
+          <Simulator onConnect={handleConnect} dark={dark} lang={lang} />
         </div>
       </section>
 
@@ -328,8 +340,8 @@ export default function Home() {
       <section className={`relative z-10 py-20 px-6 border-t ${sec}`}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>Como funciona</h2>
-            <p className={`text-sm ${muted}`}>De cero a decisiones de precio en 4 pasos.</p>
+            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>{lang === 'es' ? {lang === 'es' ? 'Como funciona' : 'How it works'} : 'How it works'}</h2>
+            <p className={`text-sm ${muted}`}>{lang === 'es' ? {lang === 'es' ? 'De cero a decisiones de precio en 4 pasos.' : 'From zero to pricing decisions in 4 steps.'} : 'From zero to pricing decisions in 4 steps.'}</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-5">
             {[
@@ -356,7 +368,7 @@ export default function Home() {
       <section className={`relative z-10 py-20 px-6 border-t ${sec}`}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>Todo lo que necesitas</h2>
+            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>{lang === 'es' ? {lang === 'es' ? 'Todo lo que necesitas' : 'Everything you need'} : 'Everything you need'}</h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
             {[
@@ -398,8 +410,8 @@ export default function Home() {
       {/* CTA final */}
       <section className={`relative z-10 py-24 px-6 border-t ${sec}`}>
         <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h2 className={`text-3xl sm:text-4xl font-black ${heading}`}>Empieza a ver tus numeros reales</h2>
-          <p className={muted}>Conecta tu tienda en 3 minutos. Sin setup. Sin tarjeta.</p>
+          <h2 className={`text-3xl sm:text-4xl font-black ${heading}`}>{lang === 'es' ? {lang === 'es' ? 'Empieza a ver tus numeros reales' : 'Start seeing your real numbers'} : 'Start seeing your real numbers'}</h2>
+          <p className={muted}>{lang === 'es' ? {lang === 'es' ? 'Conecta tu tienda en 3 minutos. Sin setup. Sin tarjeta.' : 'Connect your store in 3 minutes. No setup. No credit card.'} : 'Connect your store in 3 minutes. No setup. No credit card.'}</p>
           <button
             onClick={handleConnect}
             disabled={connecting}
@@ -408,7 +420,7 @@ export default function Home() {
             {connecting ? (
               <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Conectando...</>
             ) : (
-              <>Conectar con TiendaNube <IconArrow /></>
+              <>{lang === 'es' ? 'Conectar con TiendaNube' : 'Connect with TiendaNube'} <IconArrow /></>
             )}
           </button>
           {connectError && <p className="text-sm text-red-500">{connectError}</p>}
@@ -424,8 +436,8 @@ export default function Home() {
           </div>
           <div className={`flex items-center gap-6 text-xs ${statSub}`}>
             <a href="mailto:contact@letocorp.com" className="hover:text-emerald-500 transition-colors">contact@letocorp.com</a>
-            <a href="/terms" className="hover:text-emerald-500 transition-colors">Terminos</a>
-            <a href="/privacy" className="hover:text-emerald-500 transition-colors">Privacidad</a>
+            <a href="/terms" className="hover:text-emerald-500 transition-colors">{lang === 'es' ? {lang === 'es' ? 'Terminos' : 'Terms'} : 'Terms'}</a>
+            <a href="/privacy" className="hover:text-emerald-500 transition-colors">{lang === 'es' ? {lang === 'es' ? 'Privacidad' : 'Privacy'} : 'Privacy'}</a>
           </div>
         </div>
       </footer>

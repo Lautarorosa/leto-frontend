@@ -18,7 +18,7 @@ interface AutopilotSettings {
   last_run_at: string | null;
 }
 
-const GREEN = '#16603D';
+const GREEN = '#10B981';
 
 // TiendaNube plan presets
 const PLATFORM_PRESETS = [
@@ -154,12 +154,12 @@ export function SettingsModal({
             <button key={t.id} onClick={() => setActiveTab(t.id)}
               className={`flex-1 py-3 text-xs font-bold transition-all ${
                 activeTab === t.id
-                  ? 'text-[#16603D] border-b-2 border-[#16603D]'
+                  ? 'text-[#10B981] border-b-2 border-[#10B981]'
                   : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
               }`}>
               {t.label}
               {t.id === 'autopilot' && autopilot.enabled && (
-                <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-black bg-[#16603D] text-white">ON</span>
+                <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-black bg-[#10B981] text-white">ON</span>
               )}
             </button>
           ))}
@@ -181,7 +181,7 @@ export function SettingsModal({
               </div>
               <button
                 onClick={() => setAutopilot(a => ({ ...a, enabled: !a.enabled }))}
-                className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${autopilot.enabled ? 'bg-[#16603D]' : 'bg-slate-200 dark:bg-white/20'}`}
+                className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${autopilot.enabled ? 'bg-[#10B981]' : 'bg-slate-200 dark:bg-white/20'}`}
               >
                 <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${autopilot.enabled ? 'translate-x-7' : 'translate-x-1'}`} />
               </button>
@@ -199,13 +199,13 @@ export function SettingsModal({
                 <div key={field.key}>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">{field.label}</label>
-                    <span className="text-xs font-black text-[#16603D]">{autopilot[field.key]}{field.suffix}</span>
+                    <span className="text-xs font-black text-[#10B981]">{autopilot[field.key]}{field.suffix}</span>
                   </div>
                   <input
                     type="range" min={0} max={field.key === 'min_margin_target' ? 60 : 50} step={1}
                     value={autopilot[field.key]}
                     onChange={e => setAutopilot(a => ({ ...a, [field.key]: parseFloat(e.target.value) }))}
-                    className="w-full accent-[#16603D]"
+                    className="w-full accent-[#10B981]"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">{field.hint}</p>
                 </div>
@@ -222,8 +222,8 @@ export function SettingsModal({
 
             {/* Run result */}
             {autopilotResult && (
-              <div className="rounded-xl border border-[#16603D]/25 bg-[#16603D]/5 p-4 text-sm">
-                <p className="font-bold text-[#16603D] mb-1">Ejecución completada</p>
+              <div className="rounded-xl border border-[#10B981]/25 bg-[#10B981]/5 p-4 text-sm">
+                <p className="font-bold text-[#10B981] mb-1">Ejecución completada</p>
                 <p className="text-slate-500 dark:text-slate-400 text-xs">
                   {autopilotResult.applied} precios actualizados · {autopilotResult.skipped_guardrail} saltados por límites
                 </p>
@@ -233,8 +233,8 @@ export function SettingsModal({
             {/* Actions */}
             <div className="flex gap-3 pt-2">
               <button onClick={handleRunAutopilot} disabled={runningAutopilot || !autopilot.enabled}
-                className="flex-1 py-2.5 rounded-lg border-2 border-[#16603D] text-[#16603D] text-sm font-bold hover:bg-[#16603D]/5 transition-all disabled:opacity-40 inline-flex items-center justify-center gap-2">
-                {runningAutopilot ? <><div className="spinner border-[#16603D] w-4 h-4" /> Ejecutando…</> : 'Ejecutar ahora'}
+                className="flex-1 py-2.5 rounded-lg border-2 border-[#10B981] text-[#10B981] text-sm font-bold hover:bg-[#10B981]/5 transition-all disabled:opacity-40 inline-flex items-center justify-center gap-2">
+                {runningAutopilot ? <><div className="spinner border-[#10B981] w-4 h-4" /> Ejecutando…</> : 'Ejecutar ahora'}
               </button>
               <button onClick={handleSaveAutopilot} disabled={savingAutopilot}
                 className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white transition-all disabled:opacity-60 inline-flex items-center justify-center gap-2"
@@ -258,7 +258,7 @@ export function SettingsModal({
                     onClick={() => setSettings(s => ({ ...s, platform_commission_pct: p.value }))}
                     className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all text-center ${
                       settings.platform_commission_pct === p.value
-                        ? 'border-[#16603D] bg-[#16603D]/5'
+                        ? 'border-[#10B981] bg-[#10B981]/5'
                         : 'border-slate-200 dark:border-white/10 hover:border-slate-300'
                     }`}
                   >
@@ -283,7 +283,7 @@ export function SettingsModal({
                     onClick={() => { setSettings(s => ({ ...s, payment_commission_pct: p.value })); setCustomPayment(false); }}
                     className={`flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all ${
                       !customPayment && settings.payment_commission_pct === p.value
-                        ? 'border-[#16603D] bg-[#16603D]/5'
+                        ? 'border-[#10B981] bg-[#10B981]/5'
                         : 'border-slate-200 dark:border-white/10 hover:border-slate-300'
                     }`}
                   >
@@ -300,7 +300,7 @@ export function SettingsModal({
                 onClick={() => setCustomPayment(true)}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all mb-2 ${
                   customPayment
-                    ? 'border-[#16603D] bg-[#16603D]/5'
+                    ? 'border-[#10B981] bg-[#10B981]/5'
                     : 'border-slate-200 dark:border-white/10 hover:border-slate-300'
                 }`}
               >
@@ -316,7 +316,7 @@ export function SettingsModal({
                     step="0.01"
                     value={settings.payment_commission_pct}
                     onChange={e => setSettings(s => ({ ...s, payment_commission_pct: parseFloat(e.target.value) || 0 }))}
-                    className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-black text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#16603D]"
+                    className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-black text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]"
                   />
                   <span className="text-sm font-semibold text-slate-500">%</span>
                 </div>
@@ -340,7 +340,7 @@ export function SettingsModal({
                   step="50"
                   value={settings.avg_shipping_cost}
                   onChange={e => setSettings(s => ({ ...s, avg_shipping_cost: parseFloat(e.target.value) || 0 }))}
-                  className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-black text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#16603D]"
+                  className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-white/20 bg-white dark:bg-black text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#10B981]"
                   placeholder="0"
                 />
                 <span className="text-xs text-slate-400">ARS</span>
