@@ -156,6 +156,73 @@ function CostBreakdownPanel({ breakdown }: { breakdown: CostBreakdown }) {
   );
 }
 
+// ── Price Calculator ───────────────────────────────────────────────────────
+function PriceCalculator({ breakdown }: { breakdown: CostBreakdown }) {
+  const [targetMargin, setTargetMargin] = useState(30);
+
+  // Formula: price = cost / (1 - targetMargin/100 - platformPct/100 - paymentPct/100)
+  const totalCommissionRate = (breakdown.platform_commission_pct + breakdown.payment_commission_pct) / 100;
+  const denominator = 1 - targetMargin / 100 - totalCommissionRate;
+  const suggestedPrice = denominator > 0 ? (breakdown.cost + breakdown.shipping_cost) / denominator : null;
+  const delta = suggestedPrice ? suggestedPrice - breakdown.price : null;
+  const deltaPct = delta && breakdown.price > 0 ? (delta / breakdown.price) * 100 : null;
+
+  return (
+    <div className="mt-6 pt-6 border-t border-slate-100 dark:border-white/8">
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+        Calculadora de precio objetivo
+      </p>
+      <div className="bg-slate-50 dark:bg-white/4 rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm text-slate-600 dark:text-slate-300">Margen deseado</span>
+          <div className="flex items-center gap-2">
+            <input
+              type="range"
+              min={5}
+              max={80}
+              value={targetMargin}
+              onChange={e => setTargetMargin(Number(e.target.value))}
+              className="w-28 accent-[#16603D]"
+            />
+            <span className="text-sm font-bold text-[#16603D] w-10 text-right tabular-nums">{targetMargin}%</span>
+          </div>
+        </div>
+
+        {suggestedPrice && suggestedPrice > 0 ? (
+          <>
+            <div className="flex items-end justify-between mt-2">
+              <div>
+                <p className="text-xs text-slate-400 mb-1">Precio sugerido</p>
+                <p className="text-3xl font-black text-slate-900 dark:text-white tabular-nums">
+                  ${suggestedPrice.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+              {delta !== null && deltaPct !== null && (
+                <div className={`text-right ${delta > 0 ? 'text-amber-600' : 'text-[#16603D]'}`}>
+                  <p className="text-xs mb-1 text-slate-400">vs precio actual</p>
+                  <p className="text-lg font-bold tabular-nums">
+                    {delta > 0 ? '+' : ''}{delta.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-xs font-semibold">
+                    ({deltaPct > 0 ? '+' : ''}{deltaPct.toFixed(1)}%)
+                  </p>
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-slate-400 mt-3">
+              Con este precio tus comisiones quedan cubiertas y llegás exactamente al {targetMargin}% de margen neto.
+            </p>
+          </>
+        ) : (
+          <p className="text-sm text-[#D64545] mt-2">
+            El margen deseado es demasiado alto para cubrir las comisiones actuales.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Impact Simulator ───────────────────────────────────────────────────────
 function ImpactSimulator({ option, currentMargin }: { option: Option; currentMargin: number }) {
   const scenarios = [option.best_case, option.expected_case, option.worst_case].filter(Boolean) as SimulationScenario[];
@@ -314,6 +381,7 @@ export function RecommendationModal({
         {costBreakdown && (
           <div className="px-6">
             <CostBreakdownPanel breakdown={costBreakdown} />
+            <PriceCalculator breakdown={costBreakdown} />
           </div>
         )}
 

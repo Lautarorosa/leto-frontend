@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -20,21 +21,18 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const theme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const isDark = theme === 'dark' || (!theme && prefersDark);
-                if (isDark) {
-                  document.documentElement.classList.add('dark');
-                }
+                document.documentElement.classList.add('dark');
               } catch (e) {}
             `,
           }}
         />
       </head>
-      <body className="bg-white dark:bg-black text-slate-900 dark:text-slate-50 transition-colors">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+      <body className="bg-[#060a06] text-white transition-colors">
+        <QueryProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

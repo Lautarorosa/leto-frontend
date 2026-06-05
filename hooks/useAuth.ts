@@ -1,48 +1,45 @@
-"use client";
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useApi, clearAuth } from "./useApi";
+'use client';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+/**
+ * useAuth — authentication state via React Query.
+ *
+ * Returns:
+ *   user       — User object (null if not authenticated)
+ *   isLoading  — true while the initial /me check is in flight
+ *   isOnboarded — shortcut from user.is_onboarded
+ *   logout     — clears cookie + redirects to /
+ *
+ * Uses the shared React Query cache — only one /me request per session,
+ * no matter how many components call useAuth().
+ */
+
+import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { useMe, QK } from './useLetoQuery';
+import { api } from '@/lib/api';
+import { clearAuth } from './useApi';
 
 export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [isOnboarded, setIsOnboarded]         = useState(false);
-  const { call } = useApi();
-  const router   = useRouter();
+  const router       = useRouter();
+  const queryClient  = useQueryClient();
+  const { data: user, isLoading, error } = useMe();
 
-  // Verify auth by hitting /me — cookie is sent automatically via credentials: include
-  const checkAuth = useCallback(async () => {
+  const logout = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/auth/me`, {
-        credentials: "include",
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setIsAuthenticated(true);
-        setIsOnboarded(data.is_onboarded ?? true);
-      } else {
-        setIsAuthenticated(false);
-      }
+      await api.auth.logout();
     } catch {
-      setIsAuthenticated(false);
+      // Ignore — we'll clear local state regardless
     }
-  }, []);
-
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  const logout = useCallback(async () => {
-    // Call backend to clear the HttpOnly cookie
-    await fetch(`${API_BASE}/api/v1/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    }).catch(() => {});
     clearAuth();
-    setIsAuthenticated(false);
-    router.push("/");
-  }, [router]);
+    queryClient.clear();   // wipe all cached data on logout
+    router.push('/');
+  };
 
-  return { isAuthenticated, isOnboarded, logout, checkAuth };
+  return {
+    user:        user ?? null,
+    isLoading,
+    isAuthenticated: !!user && !error,
+    isOnboarded: user?.is_onboarded ?? false,
+    logout,
+  };
 }

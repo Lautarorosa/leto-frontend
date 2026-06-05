@@ -2,13 +2,25 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ProductsTable, type Product } from '@/components/ProductsTable';
 import { RecommendationModal } from '@/components/RecommendationModal';
 import { SettingsModal } from '@/components/SettingsModal';
-import { useApi } from '@/hooks/useApi';
+import { MarginTrendChart } from '@/components/MarginTrendChart';
+import { BulkRecommendationsModal } from '@/components/BulkRecommendationsModal';
+import { UpgradeModal } from '@/components/UpgradeModal';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { useTheme } from '@/context/ThemeContext';
 import LetoLogo from '@/components/LetoLogo';
+import {
+  useDashboardMetrics,
+  useChartProducts,
+  useSyncStore,
+  usePlan,
+  QK,
+} from '@/hooks/useLetoQuery';
+import { api } from '@/lib/api';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -122,30 +134,32 @@ const Icon = {
 
 // ── Sync Button ────────────────────────────────────────────────────────────
 
-function SyncButton({ onSynced }: { onSynced: () => void }) {
-  const [status, setStatus] = useState<'idle' | 'syncing' | 'done' | 'error'>('idle');
-  const { call } = useApi();
+function SyncButton() {
+  const { mutate, isPending, isSuccess, isError, reset } = useSyncStore();
 
-  const run = async () => {
-    if (status === 'syncing') return;
-    setStatus('syncing');
-    const res = await call('/api/v1/sync/', { method: 'POST' });
-    if (res) { setStatus('done'); setTimeout(() => { setStatus('idle'); onSynced(); }, 1500); }
-    else     { setStatus('error'); setTimeout(() => setStatus('idle'), 3000); }
+  const style = isPending ? 'text-[#16603D] border-[#16603D]/40 cursor-wait'
+    : isSuccess            ? 'text-[#16603D] border-[#16603D]'
+    : isError              ? 'text-[#D64545] border-[#D64545]/40'
+    :                        'text-slate-500 dark:text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40';
+
+  const handleClick = () => {
+    if (isPending) return;
+    if (isSuccess || isError) { reset(); return; }
+    mutate();
   };
 
-  const style = {
-    idle:    'text-slate-500 dark:text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40',
-    syncing: 'text-[#16603D] border-[#16603D]/40 cursor-wait',
-    done:    'text-[#16603D] border-[#16603D]',
-    error:   'text-[#D64545] border-[#D64545]/40',
-  }[status];
+  useEffect(() => {
+    if (isSuccess || isError) {
+      const t = setTimeout(reset, 2500);
+      return () => clearTimeout(t);
+    }
+  }, [isSuccess, isError, reset]);
 
   return (
-    <button onClick={run} disabled={status === 'syncing'}
+    <button onClick={handleClick} disabled={isPending}
       className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium transition-all ${style}`}>
-      {status === 'syncing' ? <Icon.Spin /> : status === 'done' ? <Icon.Check /> : <Icon.Refresh />}
-      {status === 'idle' ? 'Sincronizar' : status === 'syncing' ? 'Sincronizando…' : status === 'done' ? 'Listo' : 'Error'}
+      {isPending ? <Icon.Spin /> : isSuccess ? <Icon.Check /> : <Icon.Refresh />}
+      {isPending ? 'Sincronizando…' : isSuccess ? 'Listo' : isError ? 'Error' : 'Sincronizar'}
     </button>
   );
 }
@@ -333,43 +347,53 @@ function PriorityList({ products, onSelect }: { products: Product[]; onSelect: (
 // ── Main Dashboard ─────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const { user, isLoading, logout } = useAuth();
-  const { theme, toggleTheme }      = useTheme();
-  const router                      = useRouter();
-  const { call }                    = useApi();
+  const { user, isLoading, logout }      = useAuth();
+  const { theme, toggleTheme }           = useTheme();
+  const router                           = useRouter();
+  const queryClient                      = useQueryClient();
 
-  const [metrics, setMetrics]           = useState<DashboardMetrics | null>(null);
-  const [metricsLoading, setMetricsLoading] = useState(true);
-  const [products, setProducts]         = useState<Product[]>([]);
+  // ── React Query data ──────────────────────────────────────────────────
+  const {
+    data: metrics,
+    isLoading: metricsLoading,
+    error: metricsError,
+    refetch: refetchMetrics,
+  } = useDashboardMetrics();
+
+  const {
+    data: products = [],
+    error: productsError,
+  } = useChartProducts();
+
+  const { data: planData } = usePlan();
+  const plan = planData?.plan ?? 'free';
+
+  // ── UI state (no data in here) ────────────────────────────────────────
   const [selected, setSelected]         = useState<Product | null>(null);
   const [rec, setRec]                   = useState<Recommendation | null>(null);
   const [loadingRec, setLoadingRec]     = useState(false);
-  const [refreshKey, setRefreshKey]     = useState(0);
   const [exporting, setExporting]       = useState(false);
+  const [exportingXlsx, setExportingXlsx] = useState(false);
   const [activeTab, setActiveTab]       = useState<'all' | 'critical' | 'low' | 'nocost'>('all');
   const [healthyProduct, setHealthyProduct] = useState<string | null>(null);
   const [noCostToast, setNoCostToast]   = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [bulkOpen, setBulkOpen]         = useState(false);
+  const [upgradeOpen, setUpgradeOpen]   = useState(false);
 
-  const loadMetrics = useCallback(async () => {
-    setMetricsLoading(true);
-    const d = await call('/api/v1/dashboard/metrics', { method: 'GET' });
-    if (d) setMetrics(d);
-    setMetricsLoading(false);
-  }, [call]);
+  // ── Auth guard ────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!isLoading && !user) router.push('/');
+  }, [user, isLoading, router]);
 
-  // Products are fetched by ProductsTable internally — no need to fetch here too.
-  // We keep a separate fetch only for the charts (WorstChart, CategoryBars, PriorityList).
-  const loadProducts = useCallback(async () => {
-    const d = await call('/api/v1/products/?limit=200', { method: 'GET' });
-    if (d) setProducts(d.products);
-  }, [call]);
-
-  useEffect(() => { if (!isLoading && !user) router.push('/'); }, [user, isLoading, router]);
-  useEffect(() => { if (user) { loadMetrics(); loadProducts(); } }, [user, loadMetrics, loadProducts, refreshKey]);
+  // ── Handlers ──────────────────────────────────────────────────────────
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: QK.metrics });
+    queryClient.invalidateQueries({ queryKey: QK.chartProds });
+    queryClient.invalidateQueries({ predicate: (q) => q.queryKey[0] === 'products' });
+  };
 
   const handleSelect = async (p: Product) => {
-    // Product has no cost loaded — show a helpful toast instead of silent noop
     if (p.margin === null) {
       setNoCostToast(p.name);
       setTimeout(() => setNoCostToast(null), 4000);
@@ -379,42 +403,48 @@ export default function Dashboard() {
     setNoCostToast(null);
     setSelected(p);
     setLoadingRec(true);
-    const r = await call(`/api/v1/recommendations/${p.id}`, { method: 'GET' });
-    setLoadingRec(false);
-    if (r && Array.isArray(r.options) && r.options.length > 0) {
-      setRec(r);
-    } else {
-      // Product has healthy margin — no action needed
+    try {
+      const r = await api.recommendations.get(p.id);
+      if (r && Array.isArray(r.options) && r.options.length > 0) {
+        setRec(r);
+      } else {
+        setSelected(null);
+        setHealthyProduct(p.name);
+        setTimeout(() => setHealthyProduct(null), 4000);
+      }
+    } catch {
       setSelected(null);
-      setHealthyProduct(p.name);
-      setTimeout(() => setHealthyProduct(null), 4000);
+    } finally {
+      setLoadingRec(false);
     }
   };
 
-  const handleClose  = () => { setSelected(null); setRec(null); };
-  const handleSynced = () => setRefreshKey(k => k + 1);
+  const handleClose = () => { setSelected(null); setRec(null); };
 
   const handleExport = async () => {
     if (!metrics || exporting) return;
     setExporting(true);
     try {
       const { generatePDFReport } = await import('@/utils/pdfReport');
-      // Fetch recommendation history for page 4
-      const histData = await call(
-        '/api/v1/recommendations/history/all',
-        { method: 'GET' }
-      );
-      await generatePDFReport(
-        metrics,
-        products,
-        user?.name || 'Mi Tienda',
-        histData?.items,
-      );
+      const histData = await api.recommendations.history();
+      await generatePDFReport(metrics, products, user?.name || 'Mi Tienda', histData?.items);
     } finally {
       setExporting(false);
     }
   };
 
+  const handleExportExcel = async () => {
+    if (exportingXlsx || products.length === 0) return;
+    setExportingXlsx(true);
+    try {
+      const { exportProductsToExcel } = await import('@/utils/exportExcel');
+      await exportProductsToExcel(products, user?.name || 'MiTienda');
+    } finally {
+      setExportingXlsx(false);
+    }
+  };
+
+  // ── Loading / auth ────────────────────────────────────────────────────
   if (isLoading) return (
     <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-[#0a0a0a]">
       <div className="spinner h-8 w-8" style={{ borderColor: GREEN }} />
@@ -451,15 +481,63 @@ export default function Dashboard() {
             <p className="text-[10px] text-slate-400">{today}</p>
           </div>
 
+          {/* Plan badge */}
+          <button onClick={() => setUpgradeOpen(true)}
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all ${
+              plan === 'pro'
+                ? 'bg-slate-900 dark:bg-white/10 text-white'
+                : plan === 'basic'
+                ? 'bg-[#1B5E3F]/10 text-[#1B5E3F] dark:bg-[#1B5E3F]/20 dark:text-green-400'
+                : 'bg-slate-100 dark:bg-white/8 text-slate-500 hover:bg-[#1B5E3F]/10 hover:text-[#1B5E3F]'
+            }`}>
+            {plan === 'free' ? (
+              <>
+                <span>Gratis</span>
+                <span className="text-[9px] opacity-60">→ Mejorar</span>
+              </>
+            ) : plan === 'basic' ? (
+              <span>Básico ✓</span>
+            ) : (
+              <span>Pro ⚡</span>
+            )}
+          </button>
+
           <div className="flex-1" />
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Export Excel */}
+            <button onClick={handleExportExcel} disabled={exportingXlsx || products.length === 0}
+              title="Exportar a Excel"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 transition-all disabled:opacity-40">
+              {exportingXlsx ? <Icon.Spin /> : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              )}
+              <span className="hidden sm:block">{exportingXlsx ? 'Exportando…' : 'Excel'}</span>
+            </button>
+
+            {/* Export PDF */}
             <button onClick={handleExport} disabled={exporting || !metrics}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 transition-all disabled:opacity-40">
               {exporting ? <Icon.Spin /> : <Icon.Download />}
-              <span className="hidden sm:block">{exporting ? 'Generando…' : 'Exportar PDF'}</span>
+              <span className="hidden sm:block">{exporting ? 'Generando…' : 'PDF'}</span>
             </button>
+
+            {/* Aplicar en masa */}
+            {metrics && (metrics.negative_margin_count + metrics.low_margin_count) > 0 && (
+              <button onClick={() => setBulkOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800/40 text-xs font-semibold text-[#D64545] dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <span className="hidden sm:block">Aplicar en masa</span>
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-100 dark:bg-red-900/30">
+                  {metrics.negative_margin_count + metrics.low_margin_count}
+                </span>
+              </button>
+            )}
 
             {/* Settings — comisiones y envío */}
             <button onClick={() => setSettingsOpen(true)}
@@ -470,7 +548,7 @@ export default function Dashboard() {
               <span className="hidden sm:block">Comisiones</span>
             </button>
 
-            <SyncButton onSynced={handleSynced} />
+            <SyncButton />
 
             <button onClick={toggleTheme}
               className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 transition-all">
@@ -590,6 +668,15 @@ export default function Dashboard() {
           );
         })()}
 
+        {/* Error state */}
+        {metricsError && !metricsLoading && (
+          <ErrorState
+            compact
+            message="No se pudieron cargar las métricas."
+            onRetry={() => refetchMetrics()}
+          />
+        )}
+
         {/* KPIs — skeleton while loading */}
         {metricsLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -643,7 +730,7 @@ export default function Dashboard() {
               Sincronizá tu tienda para que LETO pueda analizar tus márgenes reales.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
-              <SyncButton onSynced={handleSynced} />
+              <SyncButton />
               <button
                 onClick={() => router.push('/onboarding')}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white transition-all"
@@ -681,13 +768,18 @@ export default function Dashboard() {
 
         {/* Charts + Priority */}
         {metrics && products.length > 0 && metrics.products_with_cost > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            <MarginDonut metrics={metrics} />
-            <div className="lg:col-span-2">
-              <WorstChart products={products} />
+          <>
+            {/* Trend chart — full width on first row */}
+            <MarginTrendChart />
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              <MarginDonut metrics={metrics} />
+              <div className="lg:col-span-2">
+                <WorstChart products={products} />
+              </div>
+              <CategoryBars products={products} />
             </div>
-            <CategoryBars products={products} />
-          </div>
+          </>
         )}
 
         {/* Priority list — only when there are at-risk products */}
@@ -729,8 +821,8 @@ export default function Dashboard() {
         {/* Products table */}
         <div className="bg-white dark:bg-[#111] rounded-xl border border-slate-200 dark:border-white/8 overflow-hidden">
           <ProductsTable
-            key={`${refreshKey}-${activeTab}`}
-            refreshKey={refreshKey}
+            key={activeTab}
+            
             onSelectProduct={handleSelect}
             marginFilter={activeTab === 'critical' ? 'negative' : activeTab === 'low' ? 'low' : undefined}
             noCostOnly={activeTab === 'nocost'}
@@ -760,7 +852,24 @@ export default function Dashboard() {
       <SettingsModal
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        onSaved={() => { setRefreshKey(k => k + 1); loadMetrics(); }}
+        onSaved={() => { invalidateAll(); }}
+      />
+
+      <BulkRecommendationsModal
+        products={products}
+        isOpen={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+        onApplied={() => { setBulkOpen(false); invalidateAll(); }}
+      />
+
+      <UpgradeModal
+        isOpen={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        currentPlan={plan}
+        onUpgraded={() => {
+          setUpgradeOpen(false);
+          queryClient.invalidateQueries({ queryKey: QK.plan });
+        }}
       />
 
       {selected && rec && (
@@ -773,7 +882,7 @@ export default function Dashboard() {
           costBreakdown={rec.cost_breakdown}
           isOpen={!!selected}
           onClose={handleClose}
-          onApply={() => { handleClose(); setRefreshKey(k => k + 1); }}
+          onApply={() => { handleClose(); invalidateAll(); }}
         />
       )}
 

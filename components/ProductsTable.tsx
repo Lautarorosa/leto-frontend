@@ -1,7 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useApi } from '@/hooks/useApi';
+import { api } from '@/lib/api';
+import { PriceCalculatorModal } from './PriceCalculatorModal';
 
 export interface Product {
   id: number;
@@ -36,7 +39,7 @@ interface ProductsTableProps {
   refreshKey?: number;
   marginFilter?: 'negative' | 'low' | 'good';
   noCostOnly?: boolean;
-  hideStats?: boolean;   // when embedded in Dashboard (already has KPIs)
+  hideStats?: boolean;
 }
 
 function MarginBadge({ margin }: { margin: number | null }) {
@@ -72,41 +75,61 @@ function MarginBadge({ margin }: { margin: number | null }) {
 }
 
 export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCostOnly, hideStats }: ProductsTableProps) {
-  const [products, setProducts]   = useState<Product[]>([]);
-  const [total, setTotal]         = useState(0);
-  const [stats, setStats]         = useState<ProductsResponse['margin_stats'] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter]       = useState<'all' | 'negative' | 'low' | 'no_cost'>('all');
-  const [search, setSearch]       = useState('');
-  const [page, setPage]           = useState(0);
-  const PAGE_SIZE                 = 50;
+  const [products, setProducts]         = useState<Product[]>([]);
+  const [total, setTotal]               = useState(0);
+  const [stats, setStats]               = useState<ProductsResponse['margin_stats'] | null>(null);
+  const [isLoading, setIsLoading]       = useState(true);
+  const [filter, setFilter]             = useState<'all' | 'negative' | 'low' | 'no_cost'>('all');
+  const [search, setSearch]             = useState('');
+  const [page, setPage]                 = useState(0);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [calcProduct, setCalcProduct]   = useState<Product | null>(null);
+  const PAGE_SIZE = 50;
   const { call } = useApi();
 
-  const load = useCallback(async (skip = 0) => {
+  // Categories — from React Query cache (shared with dashboard, no extra request)
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn:  api.products.categories,
+    staleTime: 30 * 60 * 1000,
+  });
+  const categories = categoriesData ?? [];
+
+  const load = useCallback(async (skip = 0, catFilter?: string | null) => {
     setIsLoading(true);
     const activeFilter = noCostOnly ? 'no_cost' : (marginFilter ?? filter);
     let endpoint: string;
+
+    const cat = catFilter !== undefined ? catFilter : activeCategory;
+    const catParam = cat ? `&category=${encodeURIComponent(cat)}` : '';
+
     if (noCostOnly) {
       endpoint = '/api/v1/products/without-cost';
     } else if (activeFilter === 'all') {
-      endpoint = `/api/v1/products/?limit=${PAGE_SIZE}&skip=${skip}`;
+      endpoint = `/api/v1/products/?limit=${PAGE_SIZE}&skip=${skip}${catParam}`;
     } else {
-      endpoint = `/api/v1/products/?margin_level=${activeFilter}&limit=${PAGE_SIZE}&skip=${skip}`;
+      endpoint = `/api/v1/products/?margin_level=${activeFilter}&limit=${PAGE_SIZE}&skip=${skip}${catParam}`;
     }
-    const data = await call(endpoint, { method: "GET" }) as ProductsResponse | null;
+    const data = await call(endpoint, { method: 'GET' }) as ProductsResponse | null;
     if (data) {
       setProducts(data.products);
       setStats(data.margin_stats);
       setTotal(data.total);
     }
     setIsLoading(false);
-  }, [call, filter, marginFilter, noCostOnly]);
+  }, [call, filter, marginFilter, noCostOnly, activeCategory]);
 
   useEffect(() => { setPage(0); load(0); }, [load, refreshKey]);
 
   const handlePage = (newPage: number) => {
     setPage(newPage);
     load(newPage * PAGE_SIZE);
+  };
+
+  const handleCategory = (cat: string | null) => {
+    setActiveCategory(cat);
+    setPage(0);
+    load(0, cat);
   };
 
   // Client-side search on current page
@@ -130,67 +153,98 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-0">
 
-      {/* Stats row — only when not embedded in Dashboard */}
+      {/* Stats row */}
       {!hideStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 border-b border-slate-100 dark:border-white/6">
           {[
             { label: 'Total productos',  value: stats?.total_products ?? 0,                  color: 'text-slate-900 dark:text-white' },
             { label: 'Margen promedio',  value: `${(stats?.avg_margin ?? 0).toFixed(1)}%`,   color: 'text-[#16603D]' },
             { label: 'Críticos',         value: stats?.negative_margin ?? 0,                 color: (stats?.negative_margin ?? 0) > 0 ? 'text-[#D64545]' : 'text-slate-900 dark:text-white' },
             { label: 'Margen bajo',      value: stats?.low_margin ?? 0,                      color: (stats?.low_margin ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-white' },
           ].map((s) => (
-            <div key={s.label} className="p-5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#101215]">
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-wide font-medium">{s.label}</p>
+            <div key={s.label} className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#101215]">
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1.5 uppercase tracking-wide font-medium">{s.label}</p>
               <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
             </div>
           ))}
         </div>
       )}
 
-      {/* Search + Filter tabs */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-5 pt-4">
-        {/* Search */}
-        <div className="relative flex-1 max-w-xs">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
-          </svg>
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar producto, SKU o categoría…"
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-slate-700 dark:text-slate-300 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#16603D]/40 focus:border-[#16603D]/60 transition-all"
-          />
+      {/* Search + Filters */}
+      <div className="px-5 pt-4 pb-3 space-y-3">
+
+        {/* Row 1: Search + margin tabs */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          {/* Search */}
+          <div className="relative flex-1 max-w-xs">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar producto, SKU o categoría…"
+              className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-slate-700 dark:text-slate-300 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#16603D]/40 focus:border-[#16603D]/60 transition-all"
+            />
+          </div>
+
+          {/* Margin filter tabs */}
+          {!marginFilter && !noCostOnly && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+              {([
+                { id: 'all',      label: 'Todos' },
+                { id: 'negative', label: '🔴 Críticos' },
+                { id: 'low',      label: '🟡 Bajo' },
+                { id: 'no_cost',  label: 'Sin costo' },
+              ] as const).map((tab) => (
+                <button key={tab.id} onClick={() => setFilter(tab.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                    filter === tab.id
+                      ? 'bg-[#16603D] text-white'
+                      : 'border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#16603D]/50 hover:text-[#16603D]'
+                  }`}>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {search && (
+            <span className="text-xs text-slate-400 whitespace-nowrap">
+              {visible.length} resultado{visible.length !== 1 ? 's' : ''}
+            </span>
+          )}
         </div>
 
-        {/* Internal filter tabs — hidden when parent controls the filter */}
-        {!marginFilter && !noCostOnly && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
-            {([
-              { id: 'all',      label: 'Todos' },
-              { id: 'negative', label: 'Críticos' },
-              { id: 'low',      label: 'Margen bajo' },
-              { id: 'no_cost',  label: 'Sin costo' },
-            ] as const).map((tab) => (
-              <button key={tab.id} onClick={() => setFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
-                  filter === tab.id
+        {/* Row 2: Category filter pills */}
+        {categories.length > 0 && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wide font-medium mr-1">Categoría:</span>
+            <button
+              onClick={() => handleCategory(null)}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                activeCategory === null
+                  ? 'bg-[#16603D] text-white'
+                  : 'bg-slate-100 dark:bg-white/8 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/12'
+              }`}>
+              Todas
+            </button>
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => handleCategory(cat === activeCategory ? null : cat)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  activeCategory === cat
                     ? 'bg-[#16603D] text-white'
-                    : 'border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#16603D]/50 hover:text-[#16603D]'
+                    : 'bg-slate-100 dark:bg-white/8 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/12'
                 }`}>
-                {tab.label}
+                {cat}
               </button>
             ))}
           </div>
-        )}
-
-        {/* Result count */}
-        {search && (
-          <span className="text-xs text-slate-400 whitespace-nowrap">
-            {visible.length} resultado{visible.length !== 1 ? 's' : ''}
-          </span>
         )}
       </div>
 
@@ -209,7 +263,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                   { label: 'Margen',      cls: 'text-right' },
                   { label: 'Stock',       cls: 'text-right hidden lg:table-cell' },
                   { label: 'Ventas/mes',  cls: 'text-right hidden xl:table-cell' },
-                  { label: '',            cls: 'pr-5' },
+                  { label: '',            cls: 'pr-5 text-right' },
                 ].map((h, i) => (
                   <th key={i} className={`px-4 py-3.5 text-xs font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase text-left ${h.cls}`}>
                     {h.label}
@@ -232,9 +286,16 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                   {/* Categoría */}
                   <td className="px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400 hidden sm:table-cell">
                     {product.category ? (
-                      <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-slate-300">
+                      <button
+                        onClick={() => handleCategory(product.category === activeCategory ? null : product.category)}
+                        className={`px-2 py-0.5 rounded-md text-xs transition-colors ${
+                          activeCategory === product.category
+                            ? 'bg-[#16603D] text-white'
+                            : 'bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-slate-300 hover:bg-[#16603D]/10 hover:text-[#16603D]'
+                        }`}
+                      >
                         {product.category}
-                      </span>
+                      </button>
                     ) : '—'}
                   </td>
 
@@ -279,19 +340,35 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                     </span>
                   </td>
 
-                  {/* Acción */}
+                  {/* Acciones */}
                   <td className="px-4 py-3.5 pr-5 text-right">
-                    <button
-                      onClick={() => onSelectProduct?.(product)}
-                      disabled={product.margin === null}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#16603D] hover:bg-[#0f4a2d] disabled:bg-slate-200 dark:disabled:bg-white/8 disabled:cursor-not-allowed text-white disabled:text-slate-400 text-xs font-semibold transition-all"
-                      aria-label={`Ver recomendaciones para ${product.name}`}
-                    >
-                      {product.margin === null ? 'Sin costo' : 'Ver opciones'}
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </button>
+                    <div className="flex items-center justify-end gap-1.5">
+                      {/* Calculadora */}
+                      {product.cost != null && (
+                        <button
+                          onClick={() => setCalcProduct(product)}
+                          title="Calculadora de precio"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 text-xs font-medium transition-all"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                          </svg>
+                          <span className="hidden sm:inline">Calcular</span>
+                        </button>
+                      )}
+                      {/* Recomendaciones */}
+                      <button
+                        onClick={() => onSelectProduct?.(product)}
+                        disabled={product.margin === null}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#16603D] hover:bg-[#0f4a2d] disabled:bg-slate-200 dark:disabled:bg-white/8 disabled:cursor-not-allowed text-white disabled:text-slate-400 text-xs font-semibold transition-all"
+                        aria-label={`Ver recomendaciones para ${product.name}`}
+                      >
+                        {product.margin === null ? 'Sin costo' : 'Ver opciones'}
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -304,6 +381,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
           <div className="flex items-center justify-between px-5 py-3 border-t border-slate-100 dark:border-white/6">
             <p className="text-xs text-slate-400">
               Mostrando {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, total)} de {total} productos
+              {activeCategory ? ` en "${activeCategory}"` : ''}
             </p>
             <div className="flex items-center gap-1">
               <button
@@ -329,8 +407,24 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
         </>
       ) : (
         <div className="py-20 text-center">
-          <p className="text-slate-400 text-sm">No se encontraron productos.</p>
+          <p className="text-slate-400 text-sm">
+            {activeCategory ? `Sin productos en "${activeCategory}".` : 'No se encontraron productos.'}
+          </p>
+          {activeCategory && (
+            <button onClick={() => handleCategory(null)} className="text-xs text-[#16603D] mt-2 hover:underline">
+              Quitar filtro de categoría
+            </button>
+          )}
         </div>
+      )}
+
+      {/* Calculator modal */}
+      {calcProduct && (
+        <PriceCalculatorModal
+          product={calcProduct}
+          isOpen={!!calcProduct}
+          onClose={() => setCalcProduct(null)}
+        />
       )}
     </div>
   );
