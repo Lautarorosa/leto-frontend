@@ -27,7 +27,7 @@ import {
 } from 'recharts';
 
 // ── Brand colors ───────────────────────────────────────────────────────────
-const GREEN  = '#16603D';
+const GREEN  = '#10B981';
 const RED    = '#D64545';
 const AMBER  = '#b45309';
 
@@ -137,10 +137,10 @@ const Icon = {
 function SyncButton() {
   const { mutate, isPending, isSuccess, isError, reset } = useSyncStore();
 
-  const style = isPending ? 'text-[#16603D] border-[#16603D]/40 cursor-wait'
-    : isSuccess            ? 'text-[#16603D] border-[#16603D]'
+  const style = isPending ? 'text-[#10B981] border-[#10B981]/40 cursor-wait'
+    : isSuccess            ? 'text-[#10B981] border-[#10B981]'
     : isError              ? 'text-[#D64545] border-[#D64545]/40'
-    :                        'text-slate-500 dark:text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40';
+    :                        'text-slate-500 dark:text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40';
 
   const handleClick = () => {
     if (isPending) return;
@@ -171,16 +171,22 @@ function KpiCard({ label, value, sub, color, icon, accent }: {
   color?: string; icon: React.ReactNode; accent?: string;
 }) {
   return (
-    <div className="bg-white dark:bg-[#111] rounded-xl border border-slate-200 dark:border-white/8 p-5 flex flex-col gap-3">
+    <div className="relative bg-white dark:bg-[#111] rounded-xl border border-slate-200 dark:border-white/8 p-5 flex flex-col gap-3 overflow-hidden hover:border-slate-300 dark:hover:border-white/15 transition-all duration-200">
+      {/* accent top bar */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-xl" style={{ background: color || '#e5e7eb', opacity: 0.7 }} />
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-semibold tracking-widest text-slate-400 dark:text-slate-500 uppercase">{label}</p>
-        <span className="text-slate-300 dark:text-slate-600">{icon}</span>
+        <span className="w-7 h-7 rounded-lg bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 dark:text-slate-500">{icon}</span>
       </div>
       <div>
-        <p className="text-2xl font-black leading-none" style={{ color: color || '#111827' }}>{value}</p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5">{sub}</p>
+        <p className="text-[28px] font-black leading-none tracking-tight" style={{ color: color || '#111827' }}>{value}</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">{sub}</p>
       </div>
-      {accent && <p className="text-[11px] font-medium" style={{ color }}>{accent}</p>}
+      {accent && (
+        <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100 dark:border-white/5">
+          <p className="text-[11px] font-semibold" style={{ color }}>{accent}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -206,7 +212,7 @@ function MarginDonut({ metrics }: { metrics: DashboardMetrics }) {
             {data.map((d, i) => <Cell key={i} fill={d.fill} />)}
           </Pie>
           <Tooltip
-            contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 11 }}
+            contentStyle={{ background: 'var(--tooltip-bg, #fff)', border: '1px solid var(--tooltip-border, #e5e7eb)', borderRadius: 8, fontSize: 11, color: 'var(--tooltip-text, #111)' }}
             formatter={(v: number) => [`${v} productos`, '']}
           />
         </PieChart>
@@ -254,7 +260,7 @@ function WorstChart({ products }: { products: Product[] }) {
           <XAxis type="number" tickFormatter={v => `${v}%`} tick={{ fontSize: 9, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 10, fill: '#6b7280' }} axisLine={false} tickLine={false} />
           <Tooltip
-            contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 11 }}
+            contentStyle={{ background: 'var(--tooltip-bg, #fff)', border: '1px solid var(--tooltip-border, #e5e7eb)', borderRadius: 8, fontSize: 11, color: 'var(--tooltip-text, #111)' }}
             formatter={(v: number) => [`${v}%`, 'Margen']}
           />
           <Bar dataKey="margin" radius={[0, 3, 3, 0]} maxBarSize={14}>
@@ -324,7 +330,7 @@ function PriorityList({ products, onSelect }: { products: Product[]; onSelect: (
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: marginColor(p.margin) }} />
               <div>
-                <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#16603D] transition-colors">{p.name}</p>
+                <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#10B981] transition-colors">{p.name}</p>
                 <p className="text-[10px] text-slate-400">{p.category}{p.sku ? ` · ${p.sku}` : ''}</p>
               </div>
             </div>
@@ -464,7 +470,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0a] transition-colors">
 
       {/* ── Header ─────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-[#0d0d0d] border-b border-slate-200 dark:border-white/8">
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#0d0d0d]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/8">
         <div className="max-w-screen-xl mx-auto px-6 h-14 flex items-center gap-5">
 
           {/* LETO identity */}
@@ -487,8 +493,8 @@ export default function Dashboard() {
               plan === 'pro'
                 ? 'bg-slate-900 dark:bg-white/10 text-white'
                 : plan === 'basic'
-                ? 'bg-[#1B5E3F]/10 text-[#1B5E3F] dark:bg-[#1B5E3F]/20 dark:text-green-400'
-                : 'bg-slate-100 dark:bg-white/8 text-slate-500 hover:bg-[#1B5E3F]/10 hover:text-[#1B5E3F]'
+                ? 'bg-[#10B981]/10 text-[#10B981] dark:bg-[#10B981]/20 dark:text-green-400'
+                : 'bg-slate-100 dark:bg-white/8 text-slate-500 hover:bg-[#10B981]/10 hover:text-[#10B981]'
             }`}>
             {plan === 'free' ? (
               <>
@@ -509,7 +515,7 @@ export default function Dashboard() {
             {/* Export Excel */}
             <button onClick={handleExportExcel} disabled={exportingXlsx || products.length === 0}
               title="Exportar a Excel"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 transition-all disabled:opacity-40">
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 transition-all disabled:opacity-40">
               {exportingXlsx ? <Icon.Spin /> : (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -520,7 +526,7 @@ export default function Dashboard() {
 
             {/* Export PDF */}
             <button onClick={handleExport} disabled={exporting || !metrics}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 transition-all disabled:opacity-40">
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 transition-all disabled:opacity-40">
               {exporting ? <Icon.Spin /> : <Icon.Download />}
               <span className="hidden sm:block">{exporting ? 'Generando…' : 'PDF'}</span>
             </button>
@@ -541,7 +547,7 @@ export default function Dashboard() {
 
             {/* Settings — comisiones y envío */}
             <button onClick={() => setSettingsOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 transition-all">
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 transition-all">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/>
               </svg>
@@ -551,7 +557,7 @@ export default function Dashboard() {
             <SyncButton />
 
             <button onClick={toggleTheme}
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-[#16603D] hover:border-[#16603D]/40 transition-all">
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-[#10B981] hover:border-[#10B981]/40 transition-all">
               {theme === 'light' ? <Icon.Moon /> : <Icon.Sun />}
             </button>
 
@@ -568,18 +574,21 @@ export default function Dashboard() {
       <main className="max-w-screen-xl mx-auto px-6 py-8 space-y-6">
 
         {/* Page title */}
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-[10px] font-semibold tracking-widest uppercase mb-1" style={{ color: GREEN }}>Panel de márgenes</p>
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white">
-              {user.name ? `${user.name}` : 'Tu tienda'}
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 rounded-full" style={{ background: GREEN }} />
+              <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: GREEN }}>Panel de márgenes</p>
+            </div>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              {user.name ? user.name : 'Tu tienda'}
             </h1>
-            <p className="text-sm text-slate-400 mt-0.5">Margen real con comisiones incluidas · {today}</p>
+            <p className="text-xs text-slate-400">Margen real con comisiones incluidas · {today}</p>
           </div>
           {metrics && metrics.negative_margin_count > 0 && (
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border" style={{ borderColor: `${RED}40`, background: `${RED}08` }}>
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border" style={{ borderColor: `${RED}30`, background: `${RED}08` }}>
               <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: RED }} />
-              <p className="text-xs font-semibold" style={{ color: RED }}>
+              <p className="text-xs font-bold" style={{ color: RED }}>
                 {metrics.negative_margin_count} {metrics.negative_margin_count === 1 ? 'producto en pérdida' : 'productos en pérdida'}
               </p>
             </div>
@@ -834,7 +843,7 @@ export default function Dashboard() {
 
       {/* ── Toast: healthy product ───────────────────────────────── */}
       {healthyProduct && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-[#16603D] text-white text-sm font-medium shadow-lg">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-[#10B981] text-white text-sm font-medium shadow-lg">
           <Icon.Check />
           <span><strong>{healthyProduct}</strong> tiene buen margen — sin acción necesaria</span>
         </div>
@@ -879,22 +888,4 @@ export default function Dashboard() {
           currentMargin={rec.current_margin}
           options={rec.options ?? []}
           recommendedOption={rec.recommended_option}
-          costBreakdown={rec.cost_breakdown}
-          isOpen={!!selected}
-          onClose={handleClose}
-          onApply={() => { handleClose(); invalidateAll(); }}
-        />
-      )}
-
-      {selected && loadingRec && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#111] rounded-xl border border-slate-200 dark:border-white/10 p-8 text-center max-w-xs w-full">
-            <div className="spinner h-8 w-8 mx-auto mb-3" style={{ borderColor: GREEN }} />
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Analizando producto…</p>
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
-}
+          costBreakdown={rec.cost_breakdown}
