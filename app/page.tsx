@@ -11,7 +11,7 @@ const IS_DEV   = process.env.NODE_ENV === 'development';
 function fmtMoney(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000)     return `$${Math.round(n / 1_000)}K`;
-  return `$${n.toFixed(0)}`;
+  return `$${Math.round(n).toLocaleString('es-AR')}`;
 }
 
 function calcSim(products: number, avgTicket: number) {
@@ -50,37 +50,55 @@ const IconShield = () => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
   </svg>
 );
+const IconMoon = () => (
+  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+  </svg>
+);
+const IconSun = () => (
+  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707z" clipRule="evenodd"/>
+  </svg>
+);
 
-function Simulator({ onConnect }: { onConnect: () => void }) {
+function Simulator({ onConnect, dark }: { onConnect: () => void; dark: boolean }) {
   const [products,  setProducts]  = useState(80);
   const [avgTicket, setAvgTicket] = useState(4500);
   const [revealed,  setRevealed]  = useState(false);
   const sim = calcSim(products, avgTicket);
 
+  const inputCls = dark
+    ? 'w-full px-4 py-3 rounded-xl border border-white/15 text-white text-lg font-bold focus:outline-none focus:border-emerald-500/60 transition-all [background:rgba(255,255,255,0.08)]'
+    : 'w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-lg font-bold focus:outline-none focus:border-emerald-500 transition-all [background:#f1f5f9]';
+
+  const cardCls = dark
+    ? 'bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 space-y-5'
+    : 'bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-sm';
+
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 space-y-5">
+      <div className={cardCls}>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
+            <label className={`block text-xs font-semibold mb-2 uppercase tracking-wider ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
               Productos
             </label>
             <input
               type="number" min={1} value={products}
               onChange={e => { setProducts(Math.max(1, parseInt(e.target.value) || 1)); setRevealed(false); }}
-              className="w-full px-4 py-3 rounded-xl bg-white/8 border border-white/15 text-white text-lg font-bold focus:outline-none focus:border-emerald-500/60 transition-all"
+              className={inputCls}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
+            <label className={`block text-xs font-semibold mb-2 uppercase tracking-wider ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
               Ticket promedio
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
+              <span className={`absolute left-4 top-1/2 -translate-y-1/2 font-bold text-sm ${dark ? 'text-slate-400' : 'text-slate-500'}`}>$</span>
               <input
                 type="number" min={1} value={avgTicket}
                 onChange={e => { setAvgTicket(Math.max(1, parseInt(e.target.value) || 1)); setRevealed(false); }}
-                className="w-full pl-8 pr-4 py-3 rounded-xl bg-white/8 border border-white/15 text-white text-lg font-bold focus:outline-none focus:border-emerald-500/60 transition-all"
+                className={inputCls.replace('px-4', 'pl-8 pr-4')}
               />
             </div>
           </div>
@@ -89,25 +107,25 @@ function Simulator({ onConnect }: { onConnect: () => void }) {
         {!revealed ? (
           <button
             onClick={() => setRevealed(true)}
-            className="w-full py-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-sm font-bold hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-all"
+            className="w-full py-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm font-bold hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-all"
           >
             Calcular mi pérdida mensual →
           </button>
         ) : (
           <div className="space-y-4">
-            <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4">
+            <div className={`rounded-xl p-4 ${dark ? 'bg-red-500/10 border border-red-500/20' : 'bg-red-50 border border-red-200'}`}>
               <div className="flex items-center gap-3 mb-3">
-                <div className="text-red-400 flex-shrink-0"><IconWarning /></div>
+                <div className="text-red-500 flex-shrink-0"><IconWarning /></div>
                 <div>
-                  <p className="text-sm font-bold text-white">
+                  <p className={`text-sm font-bold ${dark ? 'text-white' : 'text-slate-900'}`}>
                     ~{sim.productsAtRisk} productos con margen negativo real
                   </p>
-                  <p className="text-xs text-slate-400 mt-0.5">después de comisiones TN + pasarela</p>
+                  <p className={`text-xs mt-0.5 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>después de comisiones TN + pasarela</p>
                 </div>
               </div>
-              <div className="flex items-center justify-between pt-3 border-t border-red-500/15">
-                <span className="text-xs text-slate-400">Pérdida mensual estimada</span>
-                <span className="text-2xl font-black text-red-400">{fmtMoney(sim.estimatedLoss)}</span>
+              <div className={`flex items-center justify-between pt-3 border-t ${dark ? 'border-red-500/15' : 'border-red-200'}`}>
+                <span className={`text-xs ${dark ? 'text-slate-400' : 'text-slate-500'}`}>Pérdida mensual estimada</span>
+                <span className="text-2xl font-black text-red-500">{fmtMoney(sim.estimatedLoss)}</span>
               </div>
             </div>
             <button
@@ -116,7 +134,7 @@ function Simulator({ onConnect }: { onConnect: () => void }) {
             >
               Ver el número exacto de mi tienda <IconArrow />
             </button>
-            <p className="text-center text-[11px] text-slate-500">Estimación basada en promedios de tiendas LATAM</p>
+            <p className={`text-center text-[11px] ${dark ? 'text-slate-500' : 'text-slate-400'}`}>Estimación basada en promedios de tiendas LATAM</p>
           </div>
         )}
       </div>
@@ -129,6 +147,7 @@ export default function Home() {
   const router = useRouter();
   const [connecting,   setConnecting]   = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
     if (!isLoading && user) router.replace('/dashboard');
@@ -139,13 +158,13 @@ export default function Home() {
     setConnectError(null);
     try {
       const result = await fetch(`${API_BASE}/api/v1/auth/login`).then(r => {
-        if (!r.ok) throw new Error(`Backend respondió ${r.status}`);
+        if (!r.ok) throw new Error(`Backend respondio ${r.status}`);
         return r.json();
       });
       if (result?.authorization_url) {
         window.location.href = result.authorization_url;
       } else {
-        setConnectError('El backend no devolvió una URL de autorización.');
+        setConnectError('El backend no devolvio una URL de autorizacion.');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error desconocido';
@@ -157,56 +176,91 @@ export default function Home() {
 
   if (isLoading || user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#060a06]">
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-[#060a06]">
         <div className="w-7 h-7 rounded-full border-2 border-emerald-500/30 border-t-emerald-500 animate-spin" />
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#060a06] text-white overflow-x-hidden">
+  const bg    = dark ? 'bg-[#060a06] text-white'           : 'bg-slate-50 text-slate-900';
+  const nav   = dark ? 'border-white/6'                    : 'border-slate-200 bg-white/80 backdrop-blur-md';
+  const pill  = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700';
+  const muted = dark ? 'text-slate-400'                    : 'text-slate-500';
+  const sec   = dark ? 'border-white/6'                    : 'border-slate-200';
+  const card  = dark ? 'bg-white/3 border-white/8 hover:bg-white/5 hover:border-white/15' : 'bg-white border-slate-200 hover:border-emerald-200 hover:shadow-sm';
+  const statVal = dark ? 'text-emerald-400'                : 'text-emerald-600';
+  const statSub = dark ? 'text-slate-500'                  : 'text-slate-400';
+  const trustItem = dark ? 'text-slate-400'                : 'text-slate-500';
+  const iconBg = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500/20' : 'bg-emerald-50 border-emerald-200 text-emerald-600 group-hover:bg-emerald-100';
+  const featIconBg = dark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-600';
+  const heading = dark ? 'text-white'                      : 'text-slate-900';
+  const body    = dark ? 'text-slate-400'                  : 'text-slate-600';
 
-      {/* Ambient glow */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[120px]" style={{ background: 'radial-gradient(ellipse, rgba(16,185,129,0.07) 0%, transparent 70%)' }} />
-      </div>
+  return (
+    <div className={`min-h-screen overflow-x-hidden transition-colors duration-300 ${bg}`}>
+
+      {/* Ambient glow — dark only */}
+      {dark && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[120px]"
+            style={{ background: 'radial-gradient(ellipse, rgba(16,185,129,0.07) 0%, transparent 70%)' }} />
+        </div>
+      )}
 
       {/* Navbar */}
-      <nav className="relative z-10 border-b border-white/6">
+      <nav className={`relative z-10 border-b sticky top-0 ${nav}`}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <LetoLogo size={30} />
-            <span className="text-[10px] font-semibold text-slate-600 tracking-widest uppercase ml-1">Beta</span>
+            <span className={`text-[10px] font-semibold tracking-widest uppercase ml-1 ${dark ? 'text-slate-600' : 'text-slate-400'}`}>Beta</span>
           </div>
-          <button
-            onClick={handleConnect}
-            disabled={connecting}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-500/30 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/10 transition-all disabled:opacity-50"
-          >
-            {connecting ? 'Conectando…' : 'Conectar tienda'}
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Theme toggle */}
+            <button
+              onClick={() => setDark(!dark)}
+              className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all ${
+                dark
+                  ? 'border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                  : 'border-slate-200 text-slate-400 hover:text-slate-700 hover:border-slate-300'
+              }`}
+              aria-label="Toggle theme"
+            >
+              {dark ? <IconSun /> : <IconMoon />}
+            </button>
+            <button
+              onClick={handleConnect}
+              disabled={connecting}
+              className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all disabled:opacity-50 ${
+                dark
+                  ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                  : 'border-emerald-500 text-emerald-600 hover:bg-emerald-50'
+              }`}
+            >
+              {connecting ? 'Conectando...' : 'Conectar tienda'}
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Hero */}
       <section className="relative z-10 pt-20 pb-16 px-6">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Análisis de márgenes para TiendaNube
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${pill}`}>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Analisis de margenes para TiendaNube
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
-            ¿Cuánto estás{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-300">
+          <h1 className={`text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] ${heading}`}>
+            Cuanto estas{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-400">
               perdiendo
             </span>
             <br />sin saberlo?
           </h1>
 
-          <p className="text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
-            Tus márgenes reales son{' '}
-            <span className="text-white font-semibold">5–8% más bajos</span> de lo que creés.
+          <p className={`text-lg max-w-xl mx-auto leading-relaxed ${body}`}>
+            Tus margenes reales son{' '}
+            <span className={`font-semibold ${heading}`}>5-8% mas bajos</span> de lo que crees.
             Las comisiones de TiendaNube y la pasarela se comen tu ganancia producto a producto.
           </p>
 
@@ -217,21 +271,25 @@ export default function Home() {
               className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-60"
             >
               {connecting ? (
-                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Conectando…</>
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Conectando...</>
               ) : (
                 <>Conectar mi tienda gratis <IconArrow /></>
               )}
             </button>
             <a
               href="/demo"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-white/10 text-slate-300 font-semibold text-base hover:border-white/20 hover:text-white transition-all"
+              className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl border font-semibold text-base transition-all ${
+                dark
+                  ? 'border-white/15 text-slate-200 hover:border-white/30 hover:bg-white/5'
+                  : 'border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-100'
+              }`}
             >
-              Ver demo →
+              Ver demo
             </a>
           </div>
 
           {connectError && (
-            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
               <span className="font-bold">Error:</span> {connectError}
             </div>
           )}
@@ -239,17 +297,17 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      <section className="relative z-10 py-10 px-6 border-y border-white/6">
+      <section className={`relative z-10 py-10 px-6 border-y ${sec}`}>
         <div className="max-w-4xl mx-auto grid grid-cols-3 gap-6 text-center">
           {[
-            { value: '5.49%', label: 'Comisión mínima real',  sub: 'TN 2% + pasarela 3.49%' },
+            { value: '5.49%', label: 'Comision minima real',  sub: 'TN 2% + pasarela 3.49%' },
             { value: '28%',   label: 'Productos en riesgo',   sub: 'Promedio tiendas LATAM'  },
-            { value: '3 min', label: 'Para ver tus números',  sub: 'Sin setup complejo'       },
+            { value: '3 min', label: 'Para ver tus numeros',  sub: 'Sin setup complejo'       },
           ].map(s => (
             <div key={s.value} className="space-y-1">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-400">{s.value}</div>
-              <div className="text-sm font-semibold text-white">{s.label}</div>
-              <div className="text-xs text-slate-500">{s.sub}</div>
+              <div className={`text-2xl sm:text-3xl font-black ${statVal}`}>{s.value}</div>
+              <div className={`text-sm font-semibold ${heading}`}>{s.label}</div>
+              <div className={`text-xs ${statSub}`}>{s.sub}</div>
             </div>
           ))}
         </div>
@@ -259,34 +317,34 @@ export default function Home() {
       <section className="relative z-10 py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-black mb-3">Calculá tu pérdida ahora</h2>
-            <p className="text-slate-400 text-sm">Sin registrarte. Solo dos números.</p>
+            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>Calcula tu perdida ahora</h2>
+            <p className={`text-sm ${muted}`}>Sin registrarte. Solo dos numeros.</p>
           </div>
-          <Simulator onConnect={handleConnect} />
+          <Simulator onConnect={handleConnect} dark={dark} />
         </div>
       </section>
 
       {/* How it works */}
-      <section className="relative z-10 py-20 px-6 border-t border-white/6">
+      <section className={`relative z-10 py-20 px-6 border-t ${sec}`}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-2xl sm:text-3xl font-black mb-3">Cómo funciona</h2>
-            <p className="text-slate-400 text-sm">De cero a decisiones de precio en 4 pasos.</p>
+            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>Como funciona</h2>
+            <p className={`text-sm ${muted}`}>De cero a decisiones de precio en 4 pasos.</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-5">
             {[
-              { n: '01', title: 'Conectás tu TiendaNube',    body: 'OAuth seguro. LETO lee tu catálogo y precios — nunca modifica nada sin tu aprobación.'                    },
-              { n: '02', title: 'Cargás tus costos reales',  body: 'Subís un Excel con el costo de cada producto, o los cargás uno por uno.'                                  },
-              { n: '03', title: 'LETO calcula el margen real', body: 'Suma comisiones TN + pasarela + envío. Te dice exactamente qué productos te hacen perder dinero.'        },
-              { n: '04', title: 'Tomás acción con 1 click',  body: 'Para cada problema, LETO te da 3 opciones claras. Vos elegís y confirmás — LETO ejecuta.'                 },
+              { n: '01', title: 'Conectas tu TiendaNube',    body: 'OAuth seguro. LETO lee tu catalogo y precios, nunca modifica nada sin tu aprobacion.' },
+              { n: '02', title: 'Cargas tus costos reales',  body: 'Subis un Excel con el costo de cada producto, o los cargas uno por uno.' },
+              { n: '03', title: 'LETO calcula el margen real', body: 'Suma comisiones TN + pasarela + envio. Te dice exactamente que productos te hacen perder dinero.' },
+              { n: '04', title: 'Tomas accion con 1 click',  body: 'Para cada problema, LETO te da 3 opciones claras. Vos eleges y confirmas, LETO ejecuta.' },
             ].map(step => (
-              <div key={step.n} className="bg-white/3 hover:bg-white/5 border border-white/8 hover:border-white/15 rounded-2xl p-6 flex gap-4 transition-all group">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs font-black text-emerald-400 flex-shrink-0 group-hover:bg-emerald-500/20 transition-all">
+              <div key={step.n} className={`border rounded-2xl p-6 flex gap-4 transition-all group ${card}`}>
+                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-xs font-black flex-shrink-0 transition-all ${iconBg}`}>
                   {step.n}
                 </div>
                 <div>
-                  <p className="font-bold text-white mb-1">{step.title}</p>
-                  <p className="text-sm text-slate-400 leading-relaxed">{step.body}</p>
+                  <p className={`font-bold mb-1 ${heading}`}>{step.title}</p>
+                  <p className={`text-sm leading-relaxed ${body}`}>{step.body}</p>
                 </div>
               </div>
             ))}
@@ -295,40 +353,40 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="relative z-10 py-20 px-6 border-t border-white/6">
+      <section className={`relative z-10 py-20 px-6 border-t ${sec}`}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-2xl sm:text-3xl font-black mb-3">Todo lo que necesitás</h2>
+            <h2 className={`text-2xl sm:text-3xl font-black mb-3 ${heading}`}>Todo lo que necesitas</h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { icon: <IconChart />, title: 'Márgenes reales en tiempo real', body: 'Ve exactamente cuánto ganás en cada producto después de todas las comisiones.' },
-              { icon: <IconZap />,   title: 'Recomendaciones concretas',      body: '3 opciones por producto problemático: subir precio, liquidar, o pausar.'     },
-              { icon: <IconShield />,title: 'Autopilot con guardrails',        body: 'Ajustes automáticos dentro de los límites que vos configurás.'               },
+              { icon: <IconChart />, title: 'Margenes reales en tiempo real', body: 'Ve exactamente cuanto ganas en cada producto despues de todas las comisiones.' },
+              { icon: <IconZap />,   title: 'Recomendaciones concretas',      body: '3 opciones por producto problematico: subir precio, liquidar, o pausar.' },
+              { icon: <IconShield />,title: 'Autopilot con guardrails',        body: 'Ajustes automaticos dentro de los limites que vos configuras.' },
             ].map(f => (
-              <div key={f.title} className="bg-white/3 border border-white/8 rounded-2xl p-6 space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <div key={f.title} className={`border rounded-2xl p-6 space-y-3 transition-all ${card}`}>
+                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${featIconBg}`}>
                   {f.icon}
                 </div>
-                <p className="font-bold text-white">{f.title}</p>
-                <p className="text-sm text-slate-400 leading-relaxed">{f.body}</p>
+                <p className={`font-bold ${heading}`}>{f.title}</p>
+                <p className={`text-sm leading-relaxed ${body}`}>{f.body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Trust pills */}
-      <section className="relative z-10 py-10 px-6 border-t border-white/6">
+      {/* Trust */}
+      <section className={`relative z-10 py-10 px-6 border-t ${sec}`}>
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
           {[
-            'Solo lectura al catálogo',
-            'Cambios solo con tu aprobación',
-            'Sin tarjeta de crédito',
+            'Solo lectura al catalogo',
+            'Cambios solo con tu aprobacion',
+            'Sin tarjeta de credito',
             'Datos encriptados',
           ].map(item => (
-            <div key={item} className="flex items-center gap-2 text-sm text-slate-400">
-              <div className="w-4 h-4 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-400 flex-shrink-0">
+            <div key={item} className={`flex items-center gap-2 text-sm ${trustItem}`}>
+              <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${featIconBg}`}>
                 <IconCheck />
               </div>
               {item}
@@ -338,36 +396,36 @@ export default function Home() {
       </section>
 
       {/* CTA final */}
-      <section className="relative z-10 py-24 px-6 border-t border-white/6">
+      <section className={`relative z-10 py-24 px-6 border-t ${sec}`}>
         <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-black">Empezá a ver tus números reales</h2>
-          <p className="text-slate-400">Conectá tu tienda en 3 minutos. Sin setup. Sin tarjeta.</p>
+          <h2 className={`text-3xl sm:text-4xl font-black ${heading}`}>Empieza a ver tus numeros reales</h2>
+          <p className={muted}>Conecta tu tienda en 3 minutos. Sin setup. Sin tarjeta.</p>
           <button
             onClick={handleConnect}
             disabled={connecting}
             className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-60"
           >
             {connecting ? (
-              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Conectando…</>
+              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Conectando...</>
             ) : (
               <>Conectar con TiendaNube <IconArrow /></>
             )}
           </button>
-          {connectError && <p className="text-sm text-red-400">{connectError}</p>}
+          {connectError && <p className="text-sm text-red-500">{connectError}</p>}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/6 py-8 px-6">
+      <footer className={`relative z-10 border-t py-8 px-6 ${sec}`}>
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <LetoLogo size={22} showWordmark={false} />
-            <span className="text-xs text-slate-500">© 2026 LETO Corp</span>
+            <span className={`text-xs ${statSub}`}>2026 LETO Corp</span>
           </div>
-          <div className="flex items-center gap-6 text-xs text-slate-500">
-            <a href="mailto:contact@letocorp.com" className="hover:text-slate-300 transition-colors">contact@letocorp.com</a>
-            <a href="https://letocorp.netlify.app/terms" target="_blank" rel="noopener noreferrer" className="hover:text-slate-300 transition-colors">Términos</a>
-            <a href="https://letocorp.netlify.app/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-slate-300 transition-colors">Privacidad</a>
+          <div className={`flex items-center gap-6 text-xs ${statSub}`}>
+            <a href="mailto:contact@letocorp.com" className="hover:text-emerald-500 transition-colors">contact@letocorp.com</a>
+            <a href="/terms" className="hover:text-emerald-500 transition-colors">Terminos</a>
+            <a href="/privacy" className="hover:text-emerald-500 transition-colors">Privacidad</a>
           </div>
         </div>
       </footer>
@@ -378,11 +436,10 @@ export default function Home() {
             onClick={() => window.location.href = `${API_BASE}/api/v1/auth/dev-login`}
             className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs hover:text-white transition-colors"
           >
-            🔧 Dev login
+            Dev login
           </button>
         </div>
       )}
-
     </div>
   );
 }
