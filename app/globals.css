@@ -5,12 +5,12 @@
 /* Theme Variables */
 :root {
   /* ── LETO Brand ─────────────────────────────────── */
-  --color-primary:        #16603D;   /* brand green */
-  --color-primary-hover:  #0f4a2d;   /* hover state */
-  --color-primary-active: #0a3520;   /* active / pressed */
+  --color-primary:        #10B981;   /* brand emerald */
+  --color-primary-hover:  #059669;   /* hover state */
+  --color-primary-active: #047857;   /* active / pressed */
 
   /* ── Semantic ────────────────────────────────────── */
-  --color-success: #16603D;
+  --color-success: #10B981;
   --color-warning: #b45309;
   --color-error:   #D64545;
   --color-info:    #3b82f6;
@@ -101,7 +101,7 @@ body {
     min-height: 44px;
     min-width: 44px;
     gap: 8px;
-    box-shadow: 0 4px 15px rgba(0, 214, 65, 0.25), 0 0 30px rgba(0, 214, 65, 0.1);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25), 0 0 30px rgba(16, 185, 129, 0.1);
     position: relative;
     overflow: hidden;
   }
@@ -118,7 +118,7 @@ body {
   }
 
   .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 8px 25px rgba(0, 214, 65, 0.4), 0 0 50px rgba(0, 214, 65, 0.2);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4), 0 0 50px rgba(16, 185, 129, 0.2);
     transform: translateY(-3px) scale(1.02);
   }
 
@@ -278,10 +278,10 @@ body {
 
 @keyframes glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(0, 214, 65, 0.25);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
   }
   50% {
-    box-shadow: 0 0 40px rgba(0, 214, 65, 0.5);
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.5);
   }
 }
 

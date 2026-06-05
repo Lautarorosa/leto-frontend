@@ -11,21 +11,21 @@ const config: Config = {
       colors: {
         // ── LETO Brand Colors ─────────────────────────────────────────────
         brand: {
-          DEFAULT: '#00d641',   // primary CTA — bright green on black
-          light:   '#00d641',   // same as default
-          mid:     '#007e34',   // hover states
-          dark:    '#00652b',   // active / pressed
-          // legacy scale kept for backward compatibility with Tailwind classes
-          50:  '#e8fff0',
-          100: '#c3ffda',
-          200: '#80f7a8',
-          300: '#2feb6e',
-          400: '#00d641',  // brand.400 = primary
-          500: '#00d641',  // brand.500 = primary
-          600: '#007e34',  // brand.600 = hover
-          700: '#007e34',  // brand.700 = hover
-          800: '#007e34',  // brand.800 = used by btn-primary (backward compat)
-          900: '#00652b',  // brand.900 = dark
+          DEFAULT: '#10B981',   // primary CTA — emerald professional
+          light:   '#34D399',   // lighter variant
+          mid:     '#059669',   // hover states
+          dark:    '#047857',   // active / pressed
+          // scale
+          50:  '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          300: '#6ee7b7',
+          400: '#34d399',
+          500: '#10b981',  // brand.500 = primary
+          600: '#059669',  // brand.600 = hover
+          700: '#047857',  // brand.700 = active
+          800: '#065f46',
+          900: '#064e3b',
         },
         // ── Neutrals ─────────────────────────────────────────────────────
         leto: {
@@ -36,7 +36,7 @@ const config: Config = {
           text:    '#ececec',   // primary text (dark mode)
         },
         // ── Semantic ─────────────────────────────────────────────────────
-        success: '#00d641',   // aligned with brand
+        success: '#10b981',   // aligned with brand
         warning: '#f59e0b',
         error:   '#ef4444',
         info:    '#3b82f6',
@@ -67,8 +67,8 @@ const config: Config = {
         md:    '0 4px 6px -1px rgb(0 0 0 / 0.5)',
         lg:    '0 10px 15px -3px rgb(0 0 0 / 0.5)',
         xl:    '0 20px 25px -5px rgb(0 0 0 / 0.5)',
-        green: '0 0 20px rgba(0, 214, 65, 0.25)',
-        'green-lg': '0 0 40px rgba(0, 214, 65, 0.4)',
+        green: '0 0 20px rgba(16, 185, 129, 0.25)',
+        'green-lg': '0 0 40px rgba(16, 185, 129, 0.4)',
       },
       // ── Animations ────────────────────────────────────────────────────
       animation: {
