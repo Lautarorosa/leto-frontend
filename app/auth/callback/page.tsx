@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 import { Suspense } from 'react';
-import { AuthCallbackContent } from './AuthCallbackContent';
+import AuthCallbackContent from './AuthCallbackContent';
 
 export default function AuthCallbackPage() {
   return (
