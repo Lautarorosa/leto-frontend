@@ -56,7 +56,22 @@ async function proxy(request: NextRequest, context: Context, method: string) {
 
   let upstream: Response;
   try {
-    upstream = await fetch(url, { method, headers, body });
+    // Use manual redirect so we can re-attach Authorization on 307/308.
+    // Node's automatic redirect following strips the Authorization header,
+    // which causes Railway's FastAPI to return 403 when it redirects
+    // /products → /products/ (redirect_slashes=True).
+    upstream = await fetch(url, { method, headers, body, redirect: 'manual' });
+
+    // Follow one level of 307/308 redirect with headers preserved
+    if (
+      (upstream.status === 307 || upstream.status === 308) &&
+      upstream.headers.get('location')
+    ) {
+      const loc = upstream.headers.get('location')!;
+      const redirectUrl = loc.startsWith('http') ? loc : `${RAILWAY}${loc}`;
+      console.log(`[proxy] redirect ${upstream.status} → ${redirectUrl}`);
+      upstream = await fetch(redirectUrl, { method, headers, body, redirect: 'manual' });
+    }
   } catch (err) {
     console.error('[proxy] fetch failed:', err);
     return NextResponse.json({ error: 'upstream_unavailable' }, { status: 502 });
