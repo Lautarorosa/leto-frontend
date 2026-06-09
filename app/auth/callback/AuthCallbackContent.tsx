@@ -26,24 +26,22 @@ export default function AuthCallbackContent() {
       return;
     }
 
-    // Exchange one-time code for HttpOnly cookie (set by backend, no token in JS)
-    fetch(`${API_BASE}/api/v1/auth/token?code=${encodeURIComponent(tempCode)}`, {
-      credentials: "include",   // A04: cookie is set server-side
-    })
+    // Exchange one-time code via our own Next.js API route (same domain).
+    // This proxy re-issues the HttpOnly cookie on the Vercel domain so that
+    // Next.js middleware can read it. The JWT never touches client-side JS.
+    fetch(`/api/auth/exchange?code=${encodeURIComponent(tempCode)}`)
       .then((res) => {
         if (!res.ok) throw new Error("auth_failed");
         return res.json();
       })
       .then((data) => {
-        // Token is now in HttpOnly cookie — JS never touches it
-        if (data.is_onboarded) {
-          router.replace("/dashboard");
-        } else {
-          router.replace("/onboarding");
-        }
+        // Use full-page navigation so the HttpOnly cookie set by the exchange
+        // response is guaranteed to be sent on the very next server request.
+        // router.replace() is client-side and can race with cookie processing.
+        window.location.href = data.is_onboarded ? "/dashboard" : "/onboarding";
       })
       .catch(() => {
-        router.replace("/?error=auth_failed");
+        window.location.href = "/?error=auth_failed";
       });
   }, [router, searchParams]);
 
