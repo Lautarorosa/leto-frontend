@@ -13,7 +13,8 @@ import { NextRequest, NextResponse } from 'next/server';
  * cookie on the Vercel domain. The JWT never touches client-side JS.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
+// Server-side: use RAILWAY_API_URL (never exposed to client) for direct Railway calls
+const API_BASE = process.env.RAILWAY_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code');
