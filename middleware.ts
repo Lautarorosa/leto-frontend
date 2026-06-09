@@ -7,9 +7,17 @@ const PROTECTED = ['/dashboard', '/onboarding', '/recommendations'];
 // Routes only for unauthenticated users
 const AUTH_ONLY = ['/'];
 
+// Public legal routes — always accessible, no redirect logic applied
+const LEGAL = ['/privacy', '/terms', '/dpa', '/data-deletion', '/legal'];
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('leto_token')?.value;
+
+  // Legal pages are always public
+  if (LEGAL.some((path) => pathname.startsWith(path))) {
+    return NextResponse.next();
+  }
 
   const isProtected = PROTECTED.some((path) => pathname.startsWith(path));
   const isAuthOnly  = AUTH_ONLY.includes(pathname);

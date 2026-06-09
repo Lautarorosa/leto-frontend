@@ -378,6 +378,20 @@ export default function Onboarding() {
               </div>
             )}
 
+            {/* Legal acceptance */}
+            <p className="text-xs text-center text-slate-400 dark:text-slate-500 leading-relaxed">
+              Al continuar, aceptás los{' '}
+              <a href="/terms" target="_blank" rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-[#16603D] transition-colors">
+                Términos de Servicio
+              </a>{' '}
+              y reconocés haber leído la{' '}
+              <a href="/privacy" target="_blank" rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-[#16603D] transition-colors">
+                Política de Privacidad
+              </a>.
+            </p>
+
             {/* Manual fallback */}
             <div className="text-center pt-2">
               <button

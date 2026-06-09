@@ -32,12 +32,12 @@ const TEXTS = {
     feats: [
       { title: 'Márgenes reales en tiempo real', body: 'Ves exactamente cuánto ganás en cada producto después de todas las comisiones.' },
       { title: 'Recomendaciones concretas',      body: '3 opciones por producto problemático: subir precio, liquidar o pausar.' },
-      { title: 'Autopilot con guardrails',       body: 'Ajustes automáticos dentro de los límites que vos configurás.' },
+      { title: 'Acciones con guardrails',          body: 'Cada cambio requiere tu confirmación. LETO propone, vos decidís.' },
     ],
     trust: ['Solo lectura al catálogo', 'Cambios solo con tu aprobación', 'Sin tarjeta de crédito', 'Datos encriptados'],
     ctaTitle: 'Empezá a ver tus números reales', ctaSub: 'Conectá tu tienda en 3 minutos. Sin setup. Sin tarjeta.',
     ctaBtn: 'Conectar con TiendaNube', connecting: 'Conectando...',
-    terms: 'Términos', privacy: 'Privacidad',
+    terms: 'Términos', privacy: 'Privacidad', dpa: 'DPA', dataDeletion: 'Eliminación de datos',
     errBackend: 'No se puede conectar al backend.',
   },
   en: {
@@ -63,12 +63,12 @@ const TEXTS = {
     feats: [
       { title: 'Real-time real margins',    body: 'See exactly how much you earn on each product after all fees.' },
       { title: 'Concrete recommendations', body: '3 options per problematic product: raise price, liquidate, or pause.' },
-      { title: 'Autopilot with guardrails', body: 'Automatic adjustments within the limits you configure.' },
+      { title: 'Actions with guardrails',   body: 'Every change requires your confirmation. LETO suggests, you decide.' },
     ],
     trust: ['Read-only catalog access', 'Changes only with your approval', 'No credit card required', 'Encrypted data'],
     ctaTitle: 'Start seeing your real numbers', ctaSub: 'Connect your store in 3 minutes. No setup. No credit card.',
     ctaBtn: 'Connect with TiendaNube', connecting: 'Connecting...',
-    terms: 'Terms', privacy: 'Privacy',
+    terms: 'Terms', privacy: 'Privacy', dpa: 'DPA', dataDeletion: 'Data Deletion',
     errBackend: 'Cannot connect to backend.',
   },
 } as const;
@@ -446,12 +446,14 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <LetoLogo size={22} showWordmark={false} />
-            <span className={'text-xs ' + statSub}>2026 LETO Corp</span>
+            <span className={'text-xs ' + statSub}>© 2026 LETO Corp</span>
           </div>
-          <div className={'flex items-center gap-6 text-xs ' + statSub}>
-            <a href="mailto:contact@letocorp.com" className="hover:text-[#15803d] transition-colors">contact@letocorp.com</a>
+          <div className={'flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs ' + statSub}>
+            <a href="mailto:letocorp.uy@gmail.com" className="hover:text-[#15803d] transition-colors">letocorp.uy@gmail.com</a>
             <a href="/terms" className="hover:text-[#15803d] transition-colors">{tx.terms}</a>
             <a href="/privacy" className="hover:text-[#15803d] transition-colors">{tx.privacy}</a>
+            <a href="/dpa" className="hover:text-[#15803d] transition-colors">{tx.dpa}</a>
+            <a href="/data-deletion" className="hover:text-[#15803d] transition-colors">{tx.dataDeletion}</a>
           </div>
         </div>
       </footer>
