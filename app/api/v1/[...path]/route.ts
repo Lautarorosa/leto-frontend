@@ -62,9 +62,11 @@ async function proxy(request: NextRequest, context: Context, method: string) {
     // /products → /products/ (redirect_slashes=True).
     upstream = await fetch(url, { method, headers, body, redirect: 'manual' });
 
-    // Follow one level of 307/308 redirect with headers preserved
+    // Follow any 3xx redirect while preserving method + Authorization.
+    // Browsers change POST→GET on 301/302; we always keep the original method.
+    // FastAPI's redirect_slashes=True issues 301 for missing trailing slash.
     if (
-      (upstream.status === 307 || upstream.status === 308) &&
+      upstream.status >= 301 && upstream.status <= 308 &&
       upstream.headers.get('location')
     ) {
       const loc = upstream.headers.get('location')!;
