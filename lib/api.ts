@@ -164,12 +164,12 @@ export const api = {
       if (params.limit)        q.set('limit',        String(params.limit));
       if (params.category)     q.set('category',     params.category);
       if (params.margin_level) q.set('margin_level', params.margin_level);
-      return apiFetch<ProductsResponse>(`/api/v1/products/?${q}`);
+      return apiFetch<ProductsResponse>(`/api/v1/products?${q}`);
     },
     withoutCost: () => apiFetch<ProductsResponse>('/api/v1/products/without-cost'),
     categories:  () => apiFetch<string[]>('/api/v1/products/categories'),
     forCharts:   () =>
-      apiFetch<ProductsResponse>('/api/v1/products/?limit=200'),
+      apiFetch<ProductsResponse>('/api/v1/products?limit=200'),
     priceForMargin: (productId: number, targetMargin: number) =>
       apiFetch<{
         product_id: number;

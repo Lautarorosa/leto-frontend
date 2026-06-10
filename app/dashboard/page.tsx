@@ -482,9 +482,12 @@ export default function Dashboard() {
           <div className="w-px h-5 bg-slate-200 dark:bg-white/10" />
 
           {/* Store context */}
-          <div className="hidden sm:block">
-            <p className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate max-w-[200px]">{user.name || user.email}</p>
-            <p className="text-[10px] text-slate-400">{today}</p>
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#00d641] shadow-[0_0_6px_#00d641]" />
+            <div>
+              <p className="text-sm font-semibold text-slate-800 dark:text-white truncate max-w-[200px]">{user.name || user.email}</p>
+              <p className="text-[10px] text-slate-400">{today}</p>
+            </div>
           </div>
 
           {/* Plan badge */}

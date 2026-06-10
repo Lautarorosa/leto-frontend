@@ -26,7 +26,9 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await api.auth.logout();
+      // Must call the Next.js route (same domain) — Railway can't delete
+      // the Vercel-domain HttpOnly cookie.
+      await fetch('/api/auth/logout', { method: 'POST' });
     } catch {
       // Ignore — we'll clear local state regardless
     }
