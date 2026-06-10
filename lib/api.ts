@@ -213,16 +213,16 @@ export const api = {
   },
 
   settings: {
-    get:  () => apiFetch<StoreSettings>('/api/v1/settings/'),
+    get:  () => apiFetch<StoreSettings>('/api/v1/settings'),
     save: (data: Partial<StoreSettings>) =>
-      apiFetch<StoreSettings>('/api/v1/settings/', {
+      apiFetch<StoreSettings>('/api/v1/settings', {
         method: 'PUT',
         body: JSON.stringify(data),
       }),
   },
 
   sync: {
-    trigger: () => apiFetch<any>('/api/v1/sync/', { method: 'POST' }),
+    trigger: () => apiFetch<any>('/api/v1/sync', { method: 'POST' }),
     status:  () => apiFetch<any>('/api/v1/sync/status'),
   },
 };
