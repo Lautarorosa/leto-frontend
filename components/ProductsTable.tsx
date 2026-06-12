@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { useState, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { api, apiFetch } from '@/lib/api';
 import { PriceCalculatorModal } from './PriceCalculatorModal';
 
 export interface Product {
@@ -79,7 +79,27 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
   const [page, setPage]                     = useState(0);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [calcProduct, setCalcProduct]       = useState<Product | null>(null);
+  const [editingCostId, setEditingCostId]   = useState<number | null>(null);
+  const [editingCostVal, setEditingCostVal] = useState('');
+  const [savingCostId, setSavingCostId]     = useState<number | null>(null);
+  const costInputRef = useRef<HTMLInputElement>(null);
+  const queryClient  = useQueryClient();
   const PAGE_SIZE = 50;
+
+  async function saveCost(productId: number) {
+    const val = parseFloat(editingCostVal.replace(',', '.'));
+    if (isNaN(val) || val < 0) { setEditingCostId(null); return; }
+    setSavingCostId(productId);
+    try {
+      await apiFetch(`/api/v1/products/${productId}/cost`, {
+        method: 'PUT',
+        body: JSON.stringify({ cost: val }),
+      });
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+    } catch { /* ignore */ }
+    setSavingCostId(null);
+    setEditingCostId(null);
+  }
 
   // Categories — shared React Query cache, no extra request
   const { data: categories = [] } = useQuery({
@@ -310,12 +330,42 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                     )}
                   </td>
 
-                  {/* Costo */}
+                  {/* Costo — inline editable */}
                   <td className="px-4 py-3.5 text-right text-sm hidden md:table-cell">
-                    {product.cost != null
-                      ? <span className="text-slate-600 dark:text-slate-300">${product.cost.toLocaleString('es-AR')}</span>
-                      : <span className="text-amber-500 text-xs font-medium">Pendiente</span>
-                    }
+                    {editingCostId === product.id ? (
+                      <input
+                        ref={costInputRef}
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={editingCostVal}
+                        onChange={e => setEditingCostVal(e.target.value)}
+                        onBlur={() => saveCost(product.id)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') saveCost(product.id);
+                          if (e.key === 'Escape') setEditingCostId(null);
+                        }}
+                        autoFocus
+                        className="w-24 text-right text-sm font-semibold rounded-lg border border-[#15803d]/60 bg-[#15803d]/8 text-white px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#15803d]"
+                        placeholder="0"
+                      />
+                    ) : savingCostId === product.id ? (
+                      <span className="text-slate-400 text-xs">Guardando…</span>
+                    ) : product.cost != null ? (
+                      <button
+                        onClick={() => { setEditingCostId(product.id); setEditingCostVal(String(product.cost)); }}
+                        className="text-slate-300 hover:text-white hover:underline transition-colors"
+                      >
+                        ${product.cost.toLocaleString('es-AR')}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => { setEditingCostId(product.id); setEditingCostVal(''); }}
+                        className="text-amber-500 hover:text-amber-300 text-xs font-semibold underline underline-offset-2 transition-colors"
+                      >
+                        + Cargar costo
+                      </button>
+                    )}
                   </td>
 
                   {/* Margen */}
