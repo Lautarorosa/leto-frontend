@@ -108,17 +108,15 @@ export function PriceCalculatorModal({ product, isOpen, onClose }: Props) {
           {/* Current state */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Precio actual', value: `$${fmt(product.price)}` },
-              { label: 'Costo',         value: product.cost ? `$${fmt(product.cost)}` : '—' },
+              { label: 'Precio actual', value: `$${fmt(product.price)}`,  color: '#f1f5f9' },
+              { label: 'Costo',         value: product.cost ? `$${fmt(product.cost)}` : 'Sin costo',
+                color: product.cost ? '#f1f5f9' : AMBER },
               { label: 'Margen actual', value: product.margin !== null ? `${product.margin.toFixed(1)}%` : 'Sin costo',
                 color: marginColor(product.margin) },
             ].map(({ label, value, color }) => (
-              <div key={label} className="bg-slate-50 dark:bg-white/4 rounded-xl p-3 text-center">
+              <div key={label} className="rounded-xl p-3 text-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
                 <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">{label}</p>
-                <p
-                  className="text-sm font-bold"
-                  style={{ color: color ?? '#f1f5f9' }}
-                >
+                <p className="text-sm font-bold" style={{ color }}>
                   {value}
                 </p>
               </div>
