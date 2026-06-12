@@ -128,7 +128,7 @@ const IconSun = () => (
   </svg>
 );
 
-interface SimProps { onConnect: () => void; dark: boolean; tx: typeof TEXTS['es']; }
+interface SimProps { onConnect: () => void; dark: boolean; tx: typeof TEXTS[keyof typeof TEXTS]; }
 
 function Simulator({ onConnect, dark, tx }: SimProps) {
   const [products,  setProducts]  = useState(80);

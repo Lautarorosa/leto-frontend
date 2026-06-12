@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useApi } from '@/hooks/useApi';
 import { api } from '@/lib/api';
 import { PriceCalculatorModal } from './PriceCalculatorModal';
 
@@ -75,61 +74,55 @@ function MarginBadge({ margin }: { margin: number | null }) {
 }
 
 export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCostOnly, hideStats }: ProductsTableProps) {
-  const [products, setProducts]         = useState<Product[]>([]);
-  const [total, setTotal]               = useState(0);
-  const [stats, setStats]               = useState<ProductsResponse['margin_stats'] | null>(null);
-  const [isLoading, setIsLoading]       = useState(true);
-  const [filter, setFilter]             = useState<'all' | 'negative' | 'low' | 'no_cost'>('all');
-  const [search, setSearch]             = useState('');
-  const [page, setPage]                 = useState(0);
+  const [filter, setFilter]                 = useState<'all' | 'negative' | 'low' | 'no_cost'>('all');
+  const [search, setSearch]                 = useState('');
+  const [page, setPage]                     = useState(0);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [calcProduct, setCalcProduct]   = useState<Product | null>(null);
+  const [calcProduct, setCalcProduct]       = useState<Product | null>(null);
   const PAGE_SIZE = 50;
-  const { call } = useApi();
 
-  // Categories — from React Query cache (shared with dashboard, no extra request)
-  const { data: categoriesData } = useQuery({
+  // Categories — shared React Query cache, no extra request
+  const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn:  api.products.categories,
     staleTime: 30 * 60 * 1000,
   });
-  const categories = categoriesData ?? [];
 
-  const load = useCallback(async (skip = 0, catFilter?: string | null) => {
-    setIsLoading(true);
-    const activeFilter = noCostOnly ? 'no_cost' : (marginFilter ?? filter);
-    let endpoint: string;
+  // Compute effective filter
+  const isNoCost        = noCostOnly || filter === 'no_cost';
+  const activeMarginLevel = marginFilter ?? (filter !== 'all' && filter !== 'no_cost' ? filter : undefined);
 
-    const cat = catFilter !== undefined ? catFilter : activeCategory;
-    const catParam = cat ? `&category=${encodeURIComponent(cat)}` : '';
+  // Products — React Query handles caching, retries, errors
+  const productsQueryKey = isNoCost
+    ? ['products', 'without-cost', refreshKey]
+    : ['products', 'list', { limit: PAGE_SIZE, skip: page * PAGE_SIZE, category: activeCategory, margin_level: activeMarginLevel, refreshKey }];
 
-    if (noCostOnly) {
-      endpoint = '/api/v1/products/without-cost';
-    } else if (activeFilter === 'all') {
-      endpoint = `/api/v1/products/?limit=${PAGE_SIZE}&skip=${skip}${catParam}`;
-    } else {
-      endpoint = `/api/v1/products/?margin_level=${activeFilter}&limit=${PAGE_SIZE}&skip=${skip}${catParam}`;
-    }
-    const data = await call(endpoint, { method: 'GET' }) as ProductsResponse | null;
-    if (data) {
-      setProducts(data.products);
-      setStats(data.margin_stats);
-      setTotal(data.total);
-    }
-    setIsLoading(false);
-  }, [call, filter, marginFilter, noCostOnly, activeCategory]);
+  const { data: productsData, isLoading, isError } = useQuery<ProductsResponse>({
+    queryKey: productsQueryKey,
+    queryFn: () =>
+      isNoCost
+        ? api.products.withoutCost()
+        : api.products.list({
+            skip:         page * PAGE_SIZE,
+            limit:        PAGE_SIZE,
+            category:     activeCategory ?? undefined,
+            margin_level: activeMarginLevel,
+          }),
+    staleTime: 60 * 1000,
+    placeholderData: (prev) => prev,
+    retry: 2,
+  });
 
-  useEffect(() => { setPage(0); load(0); }, [load, refreshKey]);
+  const products   = productsData?.products    ?? [];
+  const stats      = productsData?.margin_stats ?? null;
+  const total      = productsData?.total        ?? 0;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  const handlePage = (newPage: number) => {
-    setPage(newPage);
-    load(newPage * PAGE_SIZE);
-  };
+  const handlePage = (newPage: number) => setPage(newPage);
 
   const handleCategory = (cat: string | null) => {
     setActiveCategory(cat);
     setPage(0);
-    load(0, cat);
   };
 
   // Client-side search on current page
@@ -141,13 +134,19 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
       )
     : products;
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-
   if (isLoading) {
     return (
       <div className="py-20 text-center">
         <div className="spinner border-[#15803d] mx-auto mb-4 h-8 w-8" />
         <p className="text-slate-400 text-sm">Cargando productos...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-slate-400 text-sm">Error al cargar productos. Intentá de nuevo.</p>
       </div>
     );
   }
@@ -191,7 +190,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
             />
           </div>
 
-          {/* Margin filter tabs */}
+          {/* Margin filter tabs — only when no external filter */}
           {!marginFilter && !noCostOnly && (
             <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
               {([
@@ -200,7 +199,7 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
                 { id: 'low',      label: '🟡 Bajo' },
                 { id: 'no_cost',  label: 'Sin costo' },
               ] as const).map((tab) => (
-                <button key={tab.id} onClick={() => setFilter(tab.id)}
+                <button key={tab.id} onClick={() => { setFilter(tab.id); setPage(0); }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                     filter === tab.id
                       ? 'bg-[#15803d] text-white'
@@ -408,7 +407,12 @@ export function ProductsTable({ onSelectProduct, refreshKey, marginFilter, noCos
       ) : (
         <div className="py-20 text-center">
           <p className="text-slate-400 text-sm">
-            {activeCategory ? `Sin productos en "${activeCategory}".` : 'No se encontraron productos.'}
+            {activeCategory
+              ? `Sin productos en "${activeCategory}".`
+              : isNoCost
+                ? 'Todos los productos tienen costo cargado. ¡Excelente!'
+                : 'No se encontraron productos.'
+            }
           </p>
           {activeCategory && (
             <button onClick={() => handleCategory(null)} className="text-xs text-[#15803d] mt-2 hover:underline">

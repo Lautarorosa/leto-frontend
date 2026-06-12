@@ -287,6 +287,20 @@ function CategoryBars({ products }: { products: Product[] }) {
     .sort((a, b) => b.avg - a.avg)
     .slice(0, 7);
 
+  if (rows.length === 0) {
+    return (
+      <div className="bg-white dark:bg-[#111] rounded-xl border border-slate-200 dark:border-white/8 p-5">
+        <p className="text-[10px] font-semibold tracking-widest text-slate-400 dark:text-slate-500 uppercase mb-4">Por categoría</p>
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Sin categorías todavía</p>
+          <p className="text-xs text-slate-400 mt-1 max-w-[220px]">
+            Sincronizá tus productos para ver el margen promedio por categoría. Los productos sin costo cargado no se incluyen.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white dark:bg-[#111] rounded-xl border border-slate-200 dark:border-white/8 p-5">
       <p className="text-[10px] font-semibold tracking-widest text-slate-400 dark:text-slate-500 uppercase mb-4">Por categoría</p>

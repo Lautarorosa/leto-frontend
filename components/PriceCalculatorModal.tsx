@@ -115,7 +115,10 @@ export function PriceCalculatorModal({ product, isOpen, onClose }: Props) {
             ].map(({ label, value, color }) => (
               <div key={label} className="bg-slate-50 dark:bg-white/4 rounded-xl p-3 text-center">
                 <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">{label}</p>
-                <p className="text-sm font-bold" style={color ? { color } : {}}>
+                <p
+                  className={`text-sm font-bold ${!color ? 'text-slate-900 dark:text-white' : ''}`}
+                  style={color ? { color } : {}}
+                >
                   {value}
                 </p>
               </div>

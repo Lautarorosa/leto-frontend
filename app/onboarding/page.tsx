@@ -167,7 +167,7 @@ export default function Onboarding() {
     if (validRows.length === 0) { setParseError('No hay filas válidas para importar.'); return; }
 
     setImporting(true);
-    const res = await call('/api/v1/products/costs/import', {
+    const res = await call<ImportResult>('/api/v1/products/costs/import', {
       method: 'POST',
       body: JSON.stringify(
         validRows.map((r) => ({ identifier: r.identifier, cost: r.cost }))
@@ -187,7 +187,7 @@ export default function Onboarding() {
 
   const loadManual = async () => {
     setFetching(true);
-    const data = await call('/api/v1/products/without-cost', { method: 'GET' });
+    const data = await call<{ products: Product[] }>('/api/v1/products/without-cost', { method: 'GET' });
     if (data) setProducts(data.products);
     setFetching(false);
     setStep('manual');

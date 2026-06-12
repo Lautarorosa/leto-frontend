@@ -3,7 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   typescript: {
-    ignoreBuildErrors: true,
+    // Errores de tipos ya corregidos — el build vuelve a validar TS.
+    ignoreBuildErrors: false,
   },
   eslint: {
     ignoreDuringBuilds: true,

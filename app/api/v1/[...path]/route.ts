@@ -30,17 +30,16 @@ function parseCookie(header: string | null, name: string): string | undefined {
 }
 
 async function proxy(request: NextRequest, context: Context, method: string) {
-  const { path } = await context.params;
-
   // Read cookie from raw header — more reliable than request.cookies in Next.js 14
   const rawCookie = request.headers.get('cookie');
   const token = parseCookie(rawCookie, 'leto_token')
     ?? request.cookies.get('leto_token')?.value;
 
   const search = request.nextUrl.search;
-  // Ensure trailing slash for Railway FastAPI endpoints
-  const pathStr = path.join('/');
-  const url = `${RAILWAY}/api/v1/${pathStr}${search}`;
+  // Preserve trailing slash from original URL — FastAPI redirect_slashes=False needs exact path
+  const originalPathname = request.nextUrl.pathname; // e.g. /api/v1/products/
+  const apiPath = originalPathname.replace(/^\/api\/v1\//, ""); // e.g. products/
+  const url = `${RAILWAY}/api/v1/${apiPath}${search}`;
 
   const headers: Record<string, string> = {
     'Content-Type': request.headers.get('Content-Type') ?? 'application/json',
